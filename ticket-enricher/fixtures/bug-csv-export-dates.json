@@ -1,0 +1,6 @@
+{
+  "id": "T-1043",
+  "subject": "CSV export shows the wrong day for our Australian users",
+  "body": "When someone in our Sydney office exports a report, every timestamp in the CSV is a day earlier than what the dashboard shows for the same rows. Users in London see matching values. Looks like the export ignores the workspace timezone and writes UTC dates without saying so. We reconcile these files against our finance system, so this is causing real mismatches. Can you fix it, or at least tell us which column is in which zone?",
+  "customer": { "name": "Dana at Contoso", "plan": "enterprise" }
+}

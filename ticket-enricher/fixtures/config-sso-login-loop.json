@@ -1,0 +1,6 @@
+{
+  "id": "T-1042",
+  "subject": "After enabling SAML, login just bounces back to the sign-in page",
+  "body": "We turned on SSO yesterday with Okta as the IdP. The Okta side reports a successful assertion, but the browser lands back on your sign-in page with no error. Users can still sign in with a password if we turn SAML off. The ACS URL we configured is https://acme.example.com/auth/saml/callback and the NameID format is emailAddress. What are we missing?",
+  "customer": { "name": "Marcus at Fabrikam", "plan": "enterprise" }
+}

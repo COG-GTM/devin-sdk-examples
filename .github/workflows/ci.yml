@@ -1,0 +1,30 @@
+name: Examples
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  example:
+    name: ${{ matrix.example }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example: [quickstart, anthropic-patterns, harness-chat, session-board, ticket-enricher]
+    defaults:
+      run:
+        working-directory: ${{ matrix.example }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+      - if: ${{ matrix.example == 'harness-chat' || matrix.example == 'session-board' }}
+        run: bun run build

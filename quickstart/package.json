@@ -1,0 +1,17 @@
+{
+  "name": "example-quickstart",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "stream": "bun src/stream.ts",
+    "events": "bun src/events.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@cognition-ai/sdk": "0.0.1-beta.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.8.3"
+  }
+}

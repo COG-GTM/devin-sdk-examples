@@ -1,0 +1,6 @@
+{
+  "id": "T-1041",
+  "subject": "Do you retry webhooks when our endpoint returns a 5xx?",
+  "body": "Our receiver was down for about ten minutes last night during a deploy and we're missing events from that window. Does your webhook delivery retry on a 500, and if so how many times and over what period? Is there anything we need to enable, or a way to replay the missed events ourselves?",
+  "customer": { "name": "Priya at Northwind", "plan": "team" }
+}

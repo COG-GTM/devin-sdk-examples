@@ -1,0 +1,21 @@
+{
+  "name": "example-anthropic-patterns",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "chaining": "bun src/chaining.ts",
+    "routing": "bun src/routing.ts",
+    "parallelization": "bun src/parallelization.ts",
+    "orchestrator-workers": "bun src/orchestrator-workers.ts",
+    "evaluator-optimizer": "bun src/evaluator-optimizer.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@cognition-ai/sdk": "0.0.1-beta.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.8.3"
+  }
+}

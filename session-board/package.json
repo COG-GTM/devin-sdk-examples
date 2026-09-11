@@ -1,0 +1,28 @@
+{
+  "name": "example-session-board",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3211",
+    "build": "next build",
+    "start": "next start -p 3211",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@cognition-ai/sdk": "0.0.1-beta.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.528.0",
+    "next": "^15.5.21",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "tailwind-merge": "^3.3.1",
+    "ws": "^8.21.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "typescript": "^5.8.3"
+  }
+}
