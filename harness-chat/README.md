@@ -37,10 +37,6 @@ your server (Next.js route)                Vercel Sandbox (one per chat)
 - `lib/workspace.ts` — read-only view into a chat's sandbox (status, files, preview URL) for the
   side panels; the lifecycle itself belongs to `HarnessAgent`.
 
-Every shell command Devin wants to run waits for your approval in the chat:
-
-![A bash tool call waiting for approval, with Allow and Deny](assets/harness-chat-approval.png)
-
 ## Run locally
 
 Local development uses the real Vercel Sandbox too — there is no local sandbox emulation, so
