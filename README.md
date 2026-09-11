@@ -41,7 +41,7 @@ output, events, permissions, `devin.api`, and the patterns these examples use â€
 agents such as Claude Code, Cursor or Devin:
 
 ```sh
-npx skills add https://github.com/COG-GTM/devin-sdk-examples/tree/main/skills/devin-sdk
+npx skills add COG-GTM/devin-sdk-examples
 ```
 
 This repository is a snapshot of the examples maintained alongside the SDK, published here
