@@ -15,7 +15,7 @@ export function prNumber(url: string): string {
   return url.split("/").filter(Boolean).at(-1) ?? url;
 }
 
-/** `usacognition/sdk` → `sdk`. */
+/** `acme/api` → `api`. */
 export function repoShort(name: string): string {
   return name.split("/").at(-1) ?? name;
 }
