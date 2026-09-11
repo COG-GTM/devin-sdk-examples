@@ -4,18 +4,7 @@ Every cloud session on one screen, grouped by whether Devin is **working**, **ne
 or **done** — updated the moment anything changes, with no per-session polling. A Next.js
 app: the server holds one connection to Devin, the browser watches the board move.
 
-```
-NEEDS YOU (2)                      WORKING (3)                        DONE (14)
-┌────────────────────────────┐     ┌────────────────────────────┐     ┌──────────────────────┐
-│ ● Fix flaky checkout test  │     │ ● Migrate billing webhooks │     │ ● Add retry to export│
-│   webapp · shop            │     │   slack · api              │     │   github · api  2h   │
-│   ↳ Should I also update   │     │   executing actions ·      │     │   ⎇ #812 merged      │
-│     the fixtures?          │     │   $ bun test               │     └──────────────────────┘
-│ ● Add rate limiting        │     │   ⎇ #815 draft +120 −4     │
-│   ↳ Answer 2 decisions     │     └────────────────────────────┘
-│   ⎇ #812 open ✓            │
-└────────────────────────────┘
-```
+![The board: needs you, working and done columns](assets/session-board.png)
 
 Each card is one session: its title, where it was started and on which repos, the one
 thing you have to do (when there is one), what Devin is doing right now, the last thing

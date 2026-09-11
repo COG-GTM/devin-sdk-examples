@@ -1,3 +1,5 @@
+![Devin SDK](./assets/hero.gif)
+
 # Devin SDK examples
 
 Runnable examples for the [Devin SDK](https://www.npmjs.com/package/@cognition-ai/sdk)
