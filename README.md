@@ -33,6 +33,17 @@ Vercel Sandbox. Each example's README lists its runtime and credentials.
 
 Requires [Bun](https://bun.com) (see `.bun-version`) and Node.js 22 or newer.
 
+## Agent skill
+
+[`skills/devin-sdk`](skills/devin-sdk/SKILL.md) is an [Agent Skills](https://agentskills.io)
+guide to the SDK — install, `createDevin`, cloud vs local, environment variables, structured
+output, events, permissions, `devin.api`, and the patterns these examples use — for coding
+agents such as Claude Code, Cursor or Devin:
+
+```sh
+npx skills add https://github.com/COG-GTM/devin-sdk-examples/tree/main/skills/devin-sdk
+```
+
 This repository is a snapshot of the examples maintained alongside the SDK, published here
 so they can be cloned and deployed on their own during the beta. Questions and problems:
 [open an issue](https://github.com/COG-GTM/devin-sdk-examples/issues).
