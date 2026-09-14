@@ -5,7 +5,7 @@
     "": {
       "name": "example-ticket-enricher",
       "dependencies": {
-        "@cognition-ai/sdk": "0.0.1-beta.1",
+        "@cognition-ai/sdk": "0.0.1-beta.2",
         "zod": "^4.4.3",
       },
       "devDependencies": {
@@ -27,7 +27,7 @@
 
     "@cognition-ai/cli-win32-x64": ["@cognition-ai/cli-win32-x64@3000.6.11", "", { "os": "win32", "cpu": "x64" }, "sha512-yonqlGuijzojDuESbKdYjOYZWutgwggnMP2Kw4pZTr6Ozxbrj5CcmZZA0bzZrHT1xYNLOEvrgisXbru9FhL4Yg=="],
 
-    "@cognition-ai/sdk": ["@cognition-ai/sdk@0.0.1-beta.1", "", { "dependencies": { "ws": "^8.21.0" }, "optionalDependencies": { "@cognition-ai/cli-darwin-arm64": "^3000.6.11", "@cognition-ai/cli-darwin-x64": "^3000.6.11", "@cognition-ai/cli-linux-arm64": "^3000.6.11", "@cognition-ai/cli-linux-x64": "^3000.6.11", "@cognition-ai/cli-win32-arm64": "^3000.6.11", "@cognition-ai/cli-win32-x64": "^3000.6.11" }, "peerDependencies": { "zod": "^3.24.0 || ^4.0.0", "zod-to-json-schema": "^3.24.0" }, "optionalPeers": ["zod", "zod-to-json-schema"] }, "sha512-pRsHlaD7I3/dRZn/On2iySHtrvJe5nwFbYVYYW2copqv1ZEqhvHJK5UZw0Px7FRGm6qu13PDiFKr4anF0krR5w=="],
+    "@cognition-ai/sdk": ["@cognition-ai/sdk@0.0.1-beta.2", "", { "optionalDependencies": { "@cognition-ai/cli-darwin-arm64": "^3000.6.11", "@cognition-ai/cli-darwin-x64": "^3000.6.11", "@cognition-ai/cli-linux-arm64": "^3000.6.11", "@cognition-ai/cli-linux-x64": "^3000.6.11", "@cognition-ai/cli-win32-arm64": "^3000.6.11", "@cognition-ai/cli-win32-x64": "^3000.6.11" }, "peerDependencies": { "zod": "^3.24.0 || ^4.0.0", "zod-to-json-schema": "^3.24.0" }, "optionalPeers": ["zod", "zod-to-json-schema"] }, "sha512-ZB1tzyY0Wud47gOvsbQspjgsrtK2USt1mYgae343emsm+ZhvYyrDdAwIBrnFJjIxORfEOViUdOGtQ/YxtkXb9A=="],
 
     "@types/bun": ["@types/bun@1.4.2", "", { "dependencies": { "bun-types": "1.4.2" } }, "sha512-GimotNn7+ZV0uVArItBbriZsR1oNf0+WTzPkdcFrzShI7k2norL0uzEaJT8T33dWr7O/c9ZDuAFQrctKCi72oQ=="],
 
@@ -38,8 +38,6 @@
     "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
     "undici-types": ["undici-types@6.21.0", "", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
-
-    "ws": ["ws@8.21.3", "", { "peerDependencies": { "bufferutil": "^4.0.1", "utf-8-validate": ">=5.0.2" }, "optionalPeers": ["bufferutil", "utf-8-validate"] }, "sha512-201TZ/kPWxoPr/OKWjquZR1SWKXcvxdH+e1xrx89b3YbmzLMFCLfnaG1HFIgWzJOEWZ7MvpK++odZufgYR50Rw=="],
 
     "zod": ["zod@4.6.2", "", {}, "sha512-lh5RCAGFa1Cm2hjtNwLQhSs/AsqdWnTQaBER9fEwN/88pSh7KOtJavtBx/0VlkN/uFd61SwYmljLMDAsHlvzBQ=="],
   }

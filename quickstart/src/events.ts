@@ -78,6 +78,8 @@ function describe(call: ToolCall): string {
       return `${status} question: ${detail.questions.map((q) => q.question).join(" | ")}`;
     case "report_blocker":
       return `${status} blocked: ${detail.headline ?? detail.impact}`;
+    case "computer_use":
+      return `${status} browser ${detail.actions.map((action) => action.action_type).join(", ")}`;
     case "other":
       return `${status} ${(call.title ?? call.kind ?? "tool").trim()}`;
   }

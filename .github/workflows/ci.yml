@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        example: [quickstart, anthropic-patterns, harness-chat, session-board, ticket-enricher]
+        example: [quickstart, anthropic-patterns, harness-chat, session-board, ticket-enricher, cloudflare-agents]
     defaults:
       run:
         working-directory: ${{ matrix.example }}
@@ -26,5 +26,7 @@ jobs:
           bun-version-file: .bun-version
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
-      - if: ${{ matrix.example == 'harness-chat' || matrix.example == 'session-board' }}
+      - if: ${{ matrix.example == 'cloudflare-agents' }}
+        run: bun run test
+      - if: ${{ matrix.example == 'harness-chat' || matrix.example == 'session-board' || matrix.example == 'cloudflare-agents' }}
         run: bun run build

@@ -7,3 +7,6 @@ next-env.d.ts
 *.tsbuildinfo
 .env.local
 .vercel/
+
+# Build output (Vite / Wrangler examples)
+dist/

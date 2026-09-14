@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "devin-cloudflare-agents",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-06-11",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/agents/*"],
+  },
+  "durable_objects": {
+    // Only `Workspace` is bound. Each `DevinChat` is a facet of a Workspace
+    // (created with `subAgent()`), so it needs no binding or migration.
+    "bindings": [{ "class_name": "Workspace", "name": "Workspace" }],
+  },
+  "migrations": [{ "new_sqlite_classes": ["Workspace"], "tag": "v1" }],
+  // Optional. Leave empty for the key's default org and https://api.devin.ai.
+  "vars": {
+    "DEVIN_ORG_ID": "",
+    "DEVIN_BASE_URL": "",
+  },
+  "secrets": {
+    "required": ["DEVIN_API_KEY"],
+  },
+}

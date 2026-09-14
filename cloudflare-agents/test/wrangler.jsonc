@@ -1,0 +1,27 @@
+{
+  "main": "../src/server.ts",
+  "compatibility_date": "2026-06-11",
+  "compatibility_flags": [
+    "nodejs_compat",
+    // The Vitest runner needs these.
+    "enable_nodejs_tty_module",
+    "enable_nodejs_fs_module",
+    "enable_nodejs_http_modules",
+    "enable_nodejs_perf_hooks_module",
+    "enable_nodejs_v8_module",
+    "enable_nodejs_process_v2",
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "class_name": "Workspace", "name": "Workspace" },
+      // vitest-pool-workers only hands facet classes to ctx.exports when they
+      // have a binding. DevinChat stays out of new_sqlite_classes.
+      { "class_name": "DevinChat", "name": "DevinChat" },
+    ],
+  },
+  "migrations": [{ "new_sqlite_classes": ["Workspace"], "tag": "v1" }],
+  "vars": {
+    "DEVIN_ORG_ID": "",
+    "DEVIN_BASE_URL": "",
+  },
+}

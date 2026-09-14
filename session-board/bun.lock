@@ -5,14 +5,13 @@
     "": {
       "name": "example-session-board",
       "dependencies": {
-        "@cognition-ai/sdk": "0.0.1-beta.1",
+        "@cognition-ai/sdk": "0.0.1-beta.2",
         "clsx": "^2.1.1",
         "lucide-react": "^0.528.0",
         "next": "^15.5.21",
         "react": "^19.2.1",
         "react-dom": "^19.2.1",
         "tailwind-merge": "^3.3.1",
-        "ws": "^8.21.0",
       },
       "devDependencies": {
         "@tailwindcss/postcss": "^4",
@@ -39,7 +38,7 @@
 
     "@cognition-ai/cli-win32-x64": ["@cognition-ai/cli-win32-x64@3000.6.11", "", { "os": "win32", "cpu": "x64" }, "sha512-yonqlGuijzojDuESbKdYjOYZWutgwggnMP2Kw4pZTr6Ozxbrj5CcmZZA0bzZrHT1xYNLOEvrgisXbru9FhL4Yg=="],
 
-    "@cognition-ai/sdk": ["@cognition-ai/sdk@0.0.1-beta.1", "", { "dependencies": { "ws": "^8.21.0" }, "optionalDependencies": { "@cognition-ai/cli-darwin-arm64": "^3000.6.11", "@cognition-ai/cli-darwin-x64": "^3000.6.11", "@cognition-ai/cli-linux-arm64": "^3000.6.11", "@cognition-ai/cli-linux-x64": "^3000.6.11", "@cognition-ai/cli-win32-arm64": "^3000.6.11", "@cognition-ai/cli-win32-x64": "^3000.6.11" }, "peerDependencies": { "zod": "^3.24.0 || ^4.0.0", "zod-to-json-schema": "^3.24.0" }, "optionalPeers": ["zod", "zod-to-json-schema"] }, "sha512-pRsHlaD7I3/dRZn/On2iySHtrvJe5nwFbYVYYW2copqv1ZEqhvHJK5UZw0Px7FRGm6qu13PDiFKr4anF0krR5w=="],
+    "@cognition-ai/sdk": ["@cognition-ai/sdk@0.0.1-beta.2", "", { "optionalDependencies": { "@cognition-ai/cli-darwin-arm64": "^3000.6.11", "@cognition-ai/cli-darwin-x64": "^3000.6.11", "@cognition-ai/cli-linux-arm64": "^3000.6.11", "@cognition-ai/cli-linux-x64": "^3000.6.11", "@cognition-ai/cli-win32-arm64": "^3000.6.11", "@cognition-ai/cli-win32-x64": "^3000.6.11" }, "peerDependencies": { "zod": "^3.24.0 || ^4.0.0", "zod-to-json-schema": "^3.24.0" }, "optionalPeers": ["zod", "zod-to-json-schema"] }, "sha512-ZB1tzyY0Wud47gOvsbQspjgsrtK2USt1mYgae343emsm+ZhvYyrDdAwIBrnFJjIxORfEOViUdOGtQ/YxtkXb9A=="],
 
     "@emnapi/runtime": ["@emnapi/runtime@1.11.3", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA=="],
 
@@ -240,8 +239,6 @@
     "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
     "undici-types": ["undici-types@6.21.0", "", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
-
-    "ws": ["ws@8.21.3", "", { "peerDependencies": { "bufferutil": "^4.0.1", "utf-8-validate": ">=5.0.2" }, "optionalPeers": ["bufferutil", "utf-8-validate"] }, "sha512-201TZ/kPWxoPr/OKWjquZR1SWKXcvxdH+e1xrx89b3YbmzLMFCLfnaG1HFIgWzJOEWZ7MvpK++odZufgYR50Rw=="],
 
     "@tailwindcss/oxide-wasm32-wasi/@emnapi/core": ["@emnapi/core@1.11.3", "", { "dependencies": { "@emnapi/wasi-threads": "1.2.3", "tslib": "^2.4.0" }, "bundled": true }, "sha512-zLpS5asjEb7lq8jYLq37N6XKaE41DIexlY1rF/z4/tIl3wo13Sqm28fRyfIsKZD+NZ8mM5RoKkpW/rBcuoSZSg=="],
 
