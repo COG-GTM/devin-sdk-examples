@@ -7,8 +7,8 @@
       "dependencies": {
         "@ai-sdk/react": "^4.0.69",
         "@cloudflare/ai-chat": "0.11.0",
-        "@cognition-ai/cloudflare-agents": "0.0.1-beta.2",
-        "@cognition-ai/sdk": "0.0.1-beta.2",
+        "@cognition-ai/cloudflare-agents": "0.0.1-beta.4",
+        "@cognition-ai/sdk": "0.0.1-beta.4",
         "@fontsource-variable/geist": "^5.2.5",
         "@fontsource-variable/geist-mono": "^5.2.5",
         "@streamdown/code": "^1.1.1",
@@ -130,7 +130,7 @@
 
     "@cloudflare/workers-types": ["@cloudflare/workers-types@5.20260903.1", "", {}, "sha512-Dgm28XJqMYj3VCNK14Xwo9UPtSPWL8Izo0emiyeQLZCRXWuhc3GnlKENF4Pf3ot+3NaWosq+yq8OIa531dCr6g=="],
 
-    "@cognition-ai/ai-sdk": ["@cognition-ai/ai-sdk@0.0.1-beta.2", "", { "dependencies": { "@cognition-ai/sdk": "0.0.1-beta.2" }, "peerDependencies": { "ai": "^7.0.0" } }, "sha512-mY10h9dKJzjrULOPuzz8rgjuC7zKhgM1FGjKbad+9glpl9lOxxcoe1uXR+hXVJ07508IOLXJ5O/GBtmaWrkVBQ=="],
+    "@cognition-ai/ai-sdk": ["@cognition-ai/ai-sdk@0.0.1-beta.4", "", { "dependencies": { "@cognition-ai/sdk": "0.0.1-beta.4" }, "peerDependencies": { "ai": "^7.0.0" } }, "sha512-aVtOwtwRRQbIe3Jkas73c8HiOvPkabhXTJov4+22kH6ljQEvPhqP/Uz7zkn9Am/ZePkavA5fs55zVURFHeUZBg=="],
 
     "@cognition-ai/cli-darwin-arm64": ["@cognition-ai/cli-darwin-arm64@3000.6.11", "", { "os": "darwin", "cpu": "arm64" }, "sha512-9MpZFPfBeuNPNUCsf9/F3NhM49/ccNdSvDncY5DzM9KeRff448HFAe0sr+PnK+Yn84D4cLwL7tqrgD8EAPALgg=="],
 
@@ -144,9 +144,9 @@
 
     "@cognition-ai/cli-win32-x64": ["@cognition-ai/cli-win32-x64@3000.6.11", "", { "os": "win32", "cpu": "x64" }, "sha512-yonqlGuijzojDuESbKdYjOYZWutgwggnMP2Kw4pZTr6Ozxbrj5CcmZZA0bzZrHT1xYNLOEvrgisXbru9FhL4Yg=="],
 
-    "@cognition-ai/cloudflare-agents": ["@cognition-ai/cloudflare-agents@0.0.1-beta.2", "", { "dependencies": { "@cognition-ai/ai-sdk": "0.0.1-beta.2", "@cognition-ai/sdk": "0.0.1-beta.2" }, "peerDependencies": { "@cloudflare/ai-chat": ">=0.11.0 <1.0.0", "agents": ">=0.22.0 <1.0.0", "ai": "^7.0.0" } }, "sha512-1GgX1plAW8rACgqVKv6Q/Er0whqfOpiLuwRoWTN+o1ZmfVGt2TnVDiUPEgY6HNKAwCs5bqOFnZqJuwqzbcScLA=="],
+    "@cognition-ai/cloudflare-agents": ["@cognition-ai/cloudflare-agents@0.0.1-beta.4", "", { "dependencies": { "@cognition-ai/ai-sdk": "0.0.1-beta.4", "@cognition-ai/sdk": "0.0.1-beta.4" }, "peerDependencies": { "@cloudflare/ai-chat": ">=0.11.0 <1.0.0", "agents": ">=0.22.0 <1.0.0", "ai": "^7.0.0" } }, "sha512-4OqCZQPKGbTravoBiaZJEh6ixeA+jrwE/Jwc9nDmjWBHSt6qWY+G8vcxIwrjmeCSzmwB4XoiiRTVBQwurZa3eA=="],
 
-    "@cognition-ai/sdk": ["@cognition-ai/sdk@0.0.1-beta.2", "", { "optionalDependencies": { "@cognition-ai/cli-darwin-arm64": "^3000.6.11", "@cognition-ai/cli-darwin-x64": "^3000.6.11", "@cognition-ai/cli-linux-arm64": "^3000.6.11", "@cognition-ai/cli-linux-x64": "^3000.6.11", "@cognition-ai/cli-win32-arm64": "^3000.6.11", "@cognition-ai/cli-win32-x64": "^3000.6.11" }, "peerDependencies": { "zod": "^3.24.0 || ^4.0.0", "zod-to-json-schema": "^3.24.0" }, "optionalPeers": ["zod", "zod-to-json-schema"] }, "sha512-ZB1tzyY0Wud47gOvsbQspjgsrtK2USt1mYgae343emsm+ZhvYyrDdAwIBrnFJjIxORfEOViUdOGtQ/YxtkXb9A=="],
+    "@cognition-ai/sdk": ["@cognition-ai/sdk@0.0.1-beta.4", "", { "optionalDependencies": { "@cognition-ai/cli-darwin-arm64": "^3000.6.11", "@cognition-ai/cli-darwin-x64": "^3000.6.11", "@cognition-ai/cli-linux-arm64": "^3000.6.11", "@cognition-ai/cli-linux-x64": "^3000.6.11", "@cognition-ai/cli-win32-arm64": "^3000.6.11", "@cognition-ai/cli-win32-x64": "^3000.6.11" }, "peerDependencies": { "@opentelemetry/api": "^1.9.0", "zod": "^3.24.0 || ^4.0.0", "zod-to-json-schema": "^3.24.0" }, "optionalPeers": ["@opentelemetry/api", "zod", "zod-to-json-schema"] }, "sha512-KxKZ8uP8sv+8wSfVRpyt6eBlbLh2BrBbtxGpKMw8R3CHtTObv0kYsV+b6Ja+v9bwGG7zMP6804euQqhM7jL1mA=="],
 
     "@cspotcode/source-map-support": ["@cspotcode/source-map-support@0.8.1", "", { "dependencies": { "@jridgewell/trace-mapping": "0.3.9" } }, "sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw=="],
 

@@ -28,7 +28,7 @@ bun add @cognition-ai/sdk@beta       # or: npm i @cognition-ai/sdk@beta
 - The packages are beta-only: every release is `0.0.1-beta.N` on the `beta` dist-tag and
   nothing is on `latest`. A plain `npm i @cognition-ai/sdk` fails **on purpose** — that is
   not a registry problem, add `@beta` or pin the exact version.
-- In an app, pin the exact version like the examples do (`"@cognition-ai/sdk": "0.0.1-beta.1"`).
+- In an app, pin the exact version like the examples do (`"@cognition-ai/sdk": "0.0.1-beta.4"`).
 - If you also use `@cognition-ai/harness-devin` (the Vercel AI SDK adapter), keep it on the
   **same** version as `@cognition-ai/sdk`.
 - Runtime: Node 22+ or Bun. The examples use Bun (`bun install`, `bun run …`).

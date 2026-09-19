@@ -26,8 +26,8 @@ export DEVIN_API_KEY=cog_…   # from app.devin.ai → Settings → API keys
 The packages are beta-only: every release is a `0.0.1-beta.N` prerelease on the `beta`
 dist-tag, so install them as `@cognition-ai/<package>@beta` (a plain `npm i @cognition-ai/sdk`
 fails on purpose). Every example here pins the beta it was tested against — currently
-`0.0.1-beta.2` — and the examples for an earlier beta are the matching tag of this repository
-(`v0.0.1-beta.1`, …).
+`0.0.1-beta.4` — and the examples for an earlier beta are the matching tag of this repository
+(`v0.0.1-beta.2`, `v0.0.1-beta.1`, …).
 
 Quickstart and anthropic-patterns support cloud and local sessions. Session-board and
 ticket-enricher use the cloud and each ship a Dockerfile; harness-chat runs the CLI inside
