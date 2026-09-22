@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@cognition-ai/sdk": "0.0.1-beta.4"
+    "@cognition-ai/sdk": "0.0.1-beta.5"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
