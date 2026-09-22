@@ -8,7 +8,8 @@
 import { createDevin } from "@cognition-ai/sdk";
 
 const local = process.argv.includes("--local");
-await using devin = await createDevin(local ? { cwd: process.cwd() } : {});
+const acpVersion = process.argv.includes("--acp-v1") ? 1 : 2;
+await using devin = await createDevin(local ? { cwd: process.cwd(), acpVersion } : { acpVersion });
 
 const session = await devin.createSession();
 const turn = session.run("Explain in one paragraph what a coding agent SDK is for. No tools.");
