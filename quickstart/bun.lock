@@ -5,7 +5,7 @@
     "": {
       "name": "example-quickstart",
       "dependencies": {
-        "@cognition-ai/sdk": "0.0.1-beta.4",
+        "@cognition-ai/sdk": "0.0.1-beta.5",
       },
       "devDependencies": {
         "@types/node": "^22.10.0",
@@ -14,19 +14,19 @@
     },
   },
   "packages": {
-    "@cognition-ai/cli-darwin-arm64": ["@cognition-ai/cli-darwin-arm64@3000.6.11", "", { "os": "darwin", "cpu": "arm64" }, "sha512-9MpZFPfBeuNPNUCsf9/F3NhM49/ccNdSvDncY5DzM9KeRff448HFAe0sr+PnK+Yn84D4cLwL7tqrgD8EAPALgg=="],
+    "@cognition-ai/cli-darwin-arm64": ["@cognition-ai/cli-darwin-arm64@3000.11.1", "", { "os": "darwin", "cpu": "arm64" }, "sha512-2L/mfxslt8OsUxpOpJ2B4BcKZo+glvd+S4Lp54ax+g3IOP8P3v/o7Q7WExJril4HmR7wbisZV7XS1BbRsPfMRg=="],
 
-    "@cognition-ai/cli-darwin-x64": ["@cognition-ai/cli-darwin-x64@3000.6.11", "", { "os": "darwin", "cpu": "x64" }, "sha512-gA5Y47+BNIr3xeGGbowMsKYsVT2IN0+gZdOV5gGKASRnjmU10lBycUlR9fJ0UAwSGywDFFQ2uRL7dDG8VlO31Q=="],
+    "@cognition-ai/cli-darwin-x64": ["@cognition-ai/cli-darwin-x64@3000.11.1", "", { "os": "darwin", "cpu": "x64" }, "sha512-TRR2QvAmdGh7LgpyI5j9lEHWBvGmGoi1ZWLxap3DbhzH5c0OygSEVsdw72MBvGPSYGVcsf0sp3eI4A7ee1LqmA=="],
 
-    "@cognition-ai/cli-linux-arm64": ["@cognition-ai/cli-linux-arm64@3000.6.11", "", { "os": "linux", "cpu": "arm64" }, "sha512-1pVJCweuhowJ1mYYUhM5bswZuvQYyiqy7TivutKe5xe49GmCzQqFP1b8Ca+qw+pK5v6OO9NPEcHqGqVvhb0xtQ=="],
+    "@cognition-ai/cli-linux-arm64": ["@cognition-ai/cli-linux-arm64@3000.11.1", "", { "os": "linux", "cpu": "arm64" }, "sha512-/LPEUTJs4cZAr3babXDJliQfKI9MoGlvj6mqo+rfoLVTsdaMbGexIl5JGSXv+N0Heuth/+IXOzLzCR1lQfERlg=="],
 
-    "@cognition-ai/cli-linux-x64": ["@cognition-ai/cli-linux-x64@3000.6.11", "", { "os": "linux", "cpu": "x64" }, "sha512-q4oSmCGmnlOcUhJU9RyPRk7hAvR96A+uW0aggBQbRExGP4vcYeyM+V3Z6aEFWfG5PB/889V3+sRfPx3egQkYFw=="],
+    "@cognition-ai/cli-linux-x64": ["@cognition-ai/cli-linux-x64@3000.11.1", "", { "os": "linux", "cpu": "x64" }, "sha512-/ccnTK4oLA0reCJBk5hgPBZYYhxjFZe1syxiHF6nr0F8uuVJiYx3OqmGsnGK5+Q+E5T5oCMnvTDPINGH/RBBKA=="],
 
-    "@cognition-ai/cli-win32-arm64": ["@cognition-ai/cli-win32-arm64@3000.6.11", "", { "os": "win32", "cpu": "arm64" }, "sha512-uMVulN3ar/J+hylnaRSmIliyBsH2+7f79efCgDaCmPmRZGFGxHCduh5cRukcAI1HHtOq8tFR2DOIqGRCZ7W+UA=="],
+    "@cognition-ai/cli-win32-arm64": ["@cognition-ai/cli-win32-arm64@3000.11.1", "", { "os": "win32", "cpu": "arm64" }, "sha512-5Z+0VlbVwXxaBt1fNm2O+5/5nQEw3tCMTb9PBIIcoSlmathgRy8AyZDRvPeNP8mnDFnGympvUXikZVzTW0s+5g=="],
 
-    "@cognition-ai/cli-win32-x64": ["@cognition-ai/cli-win32-x64@3000.6.11", "", { "os": "win32", "cpu": "x64" }, "sha512-yonqlGuijzojDuESbKdYjOYZWutgwggnMP2Kw4pZTr6Ozxbrj5CcmZZA0bzZrHT1xYNLOEvrgisXbru9FhL4Yg=="],
+    "@cognition-ai/cli-win32-x64": ["@cognition-ai/cli-win32-x64@3000.11.1", "", { "os": "win32", "cpu": "x64" }, "sha512-rviI5mLMr7KPMyvUtclOuSM6MoaZCdzbdrZjQy6BVlwlZZy/B5xWnsh/ORZsyvbR/b0bHWEbMRIswet7H6oPtA=="],
 
-    "@cognition-ai/sdk": ["@cognition-ai/sdk@0.0.1-beta.4", "", { "optionalDependencies": { "@cognition-ai/cli-darwin-arm64": "^3000.6.11", "@cognition-ai/cli-darwin-x64": "^3000.6.11", "@cognition-ai/cli-linux-arm64": "^3000.6.11", "@cognition-ai/cli-linux-x64": "^3000.6.11", "@cognition-ai/cli-win32-arm64": "^3000.6.11", "@cognition-ai/cli-win32-x64": "^3000.6.11" }, "peerDependencies": { "@opentelemetry/api": "^1.9.0", "zod": "^3.24.0 || ^4.0.0", "zod-to-json-schema": "^3.24.0" }, "optionalPeers": ["@opentelemetry/api", "zod", "zod-to-json-schema"] }, "sha512-KxKZ8uP8sv+8wSfVRpyt6eBlbLh2BrBbtxGpKMw8R3CHtTObv0kYsV+b6Ja+v9bwGG7zMP6804euQqhM7jL1mA=="],
+    "@cognition-ai/sdk": ["@cognition-ai/sdk@0.0.1-beta.5", "", { "optionalDependencies": { "@cognition-ai/cli-darwin-arm64": "^3000.11.1", "@cognition-ai/cli-darwin-x64": "^3000.11.1", "@cognition-ai/cli-linux-arm64": "^3000.11.1", "@cognition-ai/cli-linux-x64": "^3000.11.1", "@cognition-ai/cli-win32-arm64": "^3000.11.1", "@cognition-ai/cli-win32-x64": "^3000.11.1" }, "peerDependencies": { "@opentelemetry/api": "^1.9.0", "zod": "^3.24.0 || ^4.0.0", "zod-to-json-schema": "^3.24.0" }, "optionalPeers": ["@opentelemetry/api", "zod", "zod-to-json-schema"] }, "sha512-D69wQLqGULrwhPqdKL5/mfXWsR6tLbvmaNq42fiHTkvupc7VzRVyajg5i9yKREc6xtNsS7t5xkxrdDTWfv37QQ=="],
 
     "@types/node": ["@types/node@22.20.2", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-xlvWf4Vs9n1PEVYwP1n4vvG07M6y8WgvJ2t0vbrWTmijsIHp1cS+uJ2kMIRdY3nHZK0nCYKrPeD171+SzF4/zw=="],
 
