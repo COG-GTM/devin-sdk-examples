@@ -28,7 +28,7 @@ bun add @cognition-ai/sdk@beta       # or: npm i @cognition-ai/sdk@beta
 - The packages are beta-only: every release is `0.0.1-beta.N` on the `beta` dist-tag and
   nothing is on `latest`. A plain `npm i @cognition-ai/sdk` fails **on purpose** — that is
   not a registry problem, add `@beta` or pin the exact version.
-- In an app, pin the exact version like the examples do (`"@cognition-ai/sdk": "0.0.1-beta.5"`).
+- In an app, pin the exact version like the examples do (`"@cognition-ai/sdk": "0.0.1-beta.6"`).
 - If you also use `@cognition-ai/harness-devin` (the Vercel AI SDK adapter), keep it on the
   **same** version as `@cognition-ai/sdk`.
 - Runtime: Node 22+ or Bun. The examples use Bun (`bun install`, `bun run …`).
@@ -67,7 +67,11 @@ import { createDevin } from "@cognition-ai/sdk";
 await using cloud = await createDevin(); // CloudDevin — key from DEVIN_API_KEY
 await using cloud2 = await createDevin({ apiKey, orgId }); // CloudDevin
 await using local = await createDevin({ cwd: process.cwd() }); // LocalDevin
+await using v1 = await createDevin({ acpVersion: 1 }); // require ACP v1 (default offers v2, accepts v1)
 ```
+
+`acpVersion` (`1 | 2`, since beta.6) works on both transports; `devin.protocolVersion` reports
+what the agent selected. Session code is the same on either version.
 
 The implementation is literally `options.cwd !== undefined ? LocalDevin.start(options) : CloudDevin.connect(options)`.
 TypeScript narrows the return type from the options you pass.
@@ -76,7 +80,7 @@ TypeScript narrows the return type from the options you pass.
 | ----------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | Where turns run               | A Devin cloud VM; Devin clones repos itself                                                    | The bundled Devin CLI (`devin acp`) as a child process; edits real files and runs real commands in `cwd` |
 | Transport                     | ACP over WebSocket                                                                             | ACP over stdio                                                                                           |
-| Options                       | `apiKey`, `orgId`, `baseUrl`, `onPermission`, `fetch`, `clientCapabilities`                    | `cwd`, `apiKey`, `stateDir` (default `~/.devin-sdk`), `model`, `onPermission`, `clientCapabilities`      |
+| Options                       | `apiKey`, `orgId`, `baseUrl`, `onPermission`, `fetch`, `clientCapabilities`, `acpVersion`      | `cwd`, `apiKey`, `stateDir` (default `~/.devin-sdk`), `model`, `onPermission`, `clientCapabilities`, `acpVersion` |
 | `createSession` options       | `repos: ["owner/repo"]`, `orgId`, `onPermission`                                               | `cwd`, `model`, `onPermission`                                                                           |
 | `session.url`                 | The app.devin.ai link                                                                          | `undefined`                                                                                              |
 | `status` / `lifecycle` events | Yes (pushed to every attached client)                                                          | No                                                                                                       |
@@ -196,7 +200,7 @@ Two different questions, two different streams:
 - `status` (cloud) — `status` (`working`, `blocked`, `finished`, …), `userActionRequired`,
   `message`, `finishedOutcome`. **This is the "Devin needs you / is done" signal** for
   observers; it reaches every attached client.
-- `turn_state` (cloud, ACP v2) — `state: "idle"` + `stopReason` ends _your_ turn; observers
+- `turn_state` (ACP v2 only) — `state: "idle"` + `stopReason` ends _your_ turn; observers
   of sessions driven elsewhere do not get it, use `status` instead.
 - `lifecycle` (cloud) — VM `suspended` / `exited` / `stopped`.
 - `pull_request` (cloud) — an invalidation with `prUrl`; refetch, it is not the new state.

@@ -9,7 +9,8 @@
 import { createDevin, type ToolCall } from "@cognition-ai/sdk";
 
 const local = process.argv.includes("--local");
-await using devin = await createDevin(local ? { cwd: process.cwd() } : {});
+const acpVersion = process.argv.includes("--acp-v1") ? 1 : 2;
+await using devin = await createDevin(local ? { cwd: process.cwd(), acpVersion } : { acpVersion });
 
 const session = await devin.createSession();
 const turn = session.run(
@@ -41,7 +42,7 @@ for await (const event of turn) {
       );
       break;
     case "turn_state":
-      // ACP v2 only (the cloud); the local CLI ends the turn via the prompt result instead.
+      // ACP v2 only; v1 ends the turn via the prompt result.
       if (event.state === "idle") console.log(`\nturn ended: ${event.stopReason ?? "?"}`);
       break;
     default:

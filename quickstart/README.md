@@ -12,6 +12,23 @@ cloud or in the Devin CLI on your machine.
 Add `--local` to either to run in the bundled Devin CLI in the current directory instead of
 the cloud. The code is identical; only `createDevin({ cwd })` changes.
 
+## Choose the ACP version
+
+Add `--acp-v1` to either program to pass `acpVersion: 1` to `createDevin`:
+
+```sh
+bun run stream --acp-v1
+bun run events --local --acp-v1
+```
+
+Without this flag, the SDK offers ACP v2 and still accepts a v1 agent. Both versions use the
+same `createSession()`, `run()`, and typed events, so no separate v1 program is needed: the
+SDK picks the matching session methods and turn-completion signal after negotiation.
+
+The `turn_state` event is v2-only; use the result of `await turn` for completion on either
+version. Raw ACP updates keep their version-specific shapes, and the cloud `replay: "tail"`
+load option requires v2. `devin.protocolVersion` reports the selected version.
+
 ## What the events program prints
 
 ```
