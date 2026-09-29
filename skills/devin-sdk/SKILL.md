@@ -28,7 +28,7 @@ bun add @cognition-ai/sdk@beta       # or: npm i @cognition-ai/sdk@beta
 - The packages are beta-only: every release is `0.0.1-beta.N` on the `beta` dist-tag and
   nothing is on `latest`. A plain `npm i @cognition-ai/sdk` fails **on purpose** — that is
   not a registry problem, add `@beta` or pin the exact version.
-- In an app, pin the exact version like the examples do (`"@cognition-ai/sdk": "0.0.1-beta.6"`).
+- In an app, pin the exact version like the examples do (`"@cognition-ai/sdk": "0.0.1-beta.7"`).
 - If you also use `@cognition-ai/harness-devin` (the Vercel AI SDK adapter), keep it on the
   **same** version as `@cognition-ai/sdk`.
 - Runtime: Node 22+ or Bun. The examples use Bun (`bun install`, `bun run …`).
@@ -76,18 +76,18 @@ what the agent selected. Session code is the same on either version.
 The implementation is literally `options.cwd !== undefined ? LocalDevin.start(options) : CloudDevin.connect(options)`.
 TypeScript narrows the return type from the options you pass.
 
-| Concern                       | Cloud (`CloudDevin`, default)                                                                  | Local (`LocalDevin`, pass `cwd`)                                                                         |
-| ----------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Where turns run               | A Devin cloud VM; Devin clones repos itself                                                    | The bundled Devin CLI (`devin acp`) as a child process; edits real files and runs real commands in `cwd` |
-| Transport                     | ACP over WebSocket                                                                             | ACP over stdio                                                                                           |
+| Concern                       | Cloud (`CloudDevin`, default)                                                                  | Local (`LocalDevin`, pass `cwd`)                                                                                  |
+| ----------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Where turns run               | A Devin cloud VM; Devin clones repos itself                                                    | The bundled Devin CLI (`devin acp`) as a child process; edits real files and runs real commands in `cwd`          |
+| Transport                     | ACP over WebSocket                                                                             | ACP over stdio                                                                                                    |
 | Options                       | `apiKey`, `orgId`, `baseUrl`, `onPermission`, `fetch`, `clientCapabilities`, `acpVersion`      | `cwd`, `apiKey`, `stateDir` (default `~/.devin-sdk`), `model`, `onPermission`, `clientCapabilities`, `acpVersion` |
-| `createSession` options       | `repos: ["owner/repo"]`, `orgId`, `onPermission`                                               | `cwd`, `model`, `onPermission`                                                                           |
-| `session.url`                 | The app.devin.ai link                                                                          | `undefined`                                                                                              |
-| `status` / `lifecycle` events | Yes (pushed to every attached client)                                                          | No                                                                                                       |
-| `turn_state` events           | Yes (ACP v2)                                                                                   | No — the turn ends via the prompt result                                                                 |
-| `devin.api`                   | Yes                                                                                            | No                                                                                                       |
-| Extra session methods         | `setRepos`, `heartbeat`, `setSpendingLimit`, `respondToPermission`, secrets/net-policy helpers | `setModel`, `end`, `revert`/`forkFromStep`, `export`, `share`, subagent control                          |
-| Good for                      | Anything deployed: webhooks, workers, dashboards, bots                                         | Local dev tooling, CI on a checkout, scripting the CLI                                                   |
+| `createSession` options       | `repos: ["owner/repo"]`, `orgId`, `onPermission`                                               | `cwd`, `model`, `onPermission`                                                                                    |
+| `session.url`                 | The app.devin.ai link                                                                          | `undefined`                                                                                                       |
+| `status` / `lifecycle` events | Yes (pushed to every attached client)                                                          | No                                                                                                                |
+| `turn_state` events           | Yes (ACP v2)                                                                                   | No — the turn ends via the prompt result                                                                          |
+| `devin.api`                   | Yes                                                                                            | No                                                                                                                |
+| Extra session methods         | `setRepos`, `heartbeat`, `setSpendingLimit`, `respondToPermission`, secrets/net-policy helpers | `models()` / `setModel` (since beta.7), `end`, `revert`/`forkFromStep`, `export`, `share`, subagent control       |
+| Good for                      | Anything deployed: webhooks, workers, dashboards, bots                                         | Local dev tooling, CI on a checkout, scripting the CLI                                                            |
 
 Guidance:
 
