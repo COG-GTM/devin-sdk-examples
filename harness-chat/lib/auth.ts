@@ -69,12 +69,13 @@ async function verifySessionToken(token: string): Promise<boolean> {
   return secretsMatch(token.slice(dot + 1), await hmac(password, expiresAt));
 }
 
+/** The token is digits, a dot and hex, so the cookie value needs no encoding. */
 function cookieValue(request: Request, name: string): string | null {
   const header = request.headers.get("cookie");
   if (!header) return null;
   for (const part of header.split(";")) {
     const [key, ...rest] = part.trim().split("=");
-    if (key === name) return decodeURIComponent(rest.join("="));
+    if (key === name) return rest.join("=");
   }
   return null;
 }
@@ -90,7 +91,7 @@ export async function isAuthenticated(request: Request): Promise<boolean> {
 
 export function sessionCookie(token: string, maxAge: number): string {
   const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
-  return `${AUTH_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${String(maxAge)}${secure}`;
+  return `${AUTH_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${String(maxAge)}${secure}`;
 }
 
 export function clearedSessionCookie(): string {

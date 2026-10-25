@@ -3,6 +3,9 @@ import { DevinDashed } from "@/components/devin-mark";
 
 import { LoginForm } from "./login-form";
 
+/** Read the password at request time, not at build time: the two environments can differ. */
+export const dynamic = "force-dynamic";
+
 export default function LoginPage() {
   const configured = configuredPassword() !== null;
   return (

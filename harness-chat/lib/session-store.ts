@@ -146,6 +146,25 @@ export async function activeStreamId(chatId: string): Promise<string | null> {
   return redis.get<string>(streamKey(chatId));
 }
 
+/**
+ * Login throttle: a fixed window of failed attempts per client address,
+ * shared across server instances. True when the client may try again.
+ */
+const LOGIN_WINDOW_SECONDS = 15 * 60;
+const LOGIN_MAX_FAILURES = 10;
+const loginFailuresKey = (client: string) => `harness-chat:login-failures:${client}`;
+
+export async function loginAllowed(client: string): Promise<boolean> {
+  const failures = await redis.get<number>(loginFailuresKey(client));
+  return (failures ?? 0) < LOGIN_MAX_FAILURES;
+}
+
+export async function recordLoginFailure(client: string): Promise<void> {
+  const key = loginFailuresKey(client);
+  const failures = await redis.incr(key);
+  if (failures === 1) await redis.expire(key, LOGIN_WINDOW_SECONDS);
+}
+
 async function activeChatIds(chatIds: string[]): Promise<Set<string>> {
   if (chatIds.length === 0) return new Set();
   const ids = await redis.mget<(string | null)[]>(...chatIds.map(streamKey));

@@ -5,15 +5,26 @@ import {
   sessionCookie,
   verifyPassword,
 } from "@/lib/auth";
+import { loginAllowed, recordLoginFailure } from "@/lib/session-store";
+
+/** The client address as the platform's proxy reports it (Vercel sets `x-forwarded-for`). */
+function clientAddress(request: Request): string {
+  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+}
 
 /** Sign in: trade the shared password for the session cookie. */
 export async function POST(request: Request) {
   if (configuredPassword() === null) {
     return Response.json({ error: "HARNESS_CHAT_PASSWORD is not set" }, { status: 503 });
   }
+  const client = clientAddress(request);
+  if (!(await loginAllowed(client))) {
+    return Response.json({ error: "too many attempts, try again later" }, { status: 429 });
+  }
   const body = (await request.json().catch(() => null)) as { password?: unknown } | null;
   const password = typeof body?.password === "string" ? body.password : "";
   if (!(await verifyPassword(password))) {
+    await recordLoginFailure(client);
     return Response.json({ error: "wrong password" }, { status: 401 });
   }
   const { token, maxAge } = await issueSessionToken();

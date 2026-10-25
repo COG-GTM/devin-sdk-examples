@@ -20,7 +20,13 @@ export function LoginForm() {
         body: JSON.stringify({ password }),
       });
       if (!res.ok) {
-        setError(res.status === 401 ? "Wrong password" : `HTTP ${String(res.status)}`);
+        setError(
+          res.status === 401
+            ? "Wrong password"
+            : res.status === 429
+              ? "Too many attempts, try again in a few minutes"
+              : `HTTP ${String(res.status)}`,
+        );
         return;
       }
       window.location.assign("/");
