@@ -15,7 +15,14 @@ import { toast } from "sonner";
 import { StickToBottom } from "use-stick-to-bottom";
 
 import type { BootData, DevinUIMessage } from "@/lib/agent";
-import { deleteSession, refreshSessions, useSandbox, useSessions, useTranscript } from "@/lib/api";
+import {
+  deleteSession,
+  refreshSessions,
+  signOut,
+  useSandbox,
+  useSessions,
+  useTranscript,
+} from "@/lib/api";
 import type { SessionMeta } from "@/lib/session-store";
 import { Composer } from "@/components/composer";
 import { DevinDashed } from "@/components/devin-mark";
@@ -26,7 +33,7 @@ import { PreviewPane, SandboxDetails } from "@/components/sandbox-panel";
 import { SessionsRail } from "@/components/sessions-rail";
 import { deriveStatus, StatusLine } from "@/components/status-line";
 import { notify } from "@/components/toaster";
-import { LoadError, Skeleton, SkeletonLines } from "@/components/ui";
+import { Button, LoadError, Skeleton, SkeletonLines } from "@/components/ui";
 
 const TEST_PROMPTS = [
   "Build a React todo list app with Vite and start it on port 5173",
@@ -109,9 +116,14 @@ export function Console() {
             Devin Harness Console
           </span>
         </div>
-        <span className="hidden md:inline ml-auto font-mono text-xs text-muted-foreground">
-          AI SDK HarnessAgent · Vercel Sandbox
-        </span>
+        <div className="ml-auto flex items-center gap-2">
+          <span className="hidden md:inline font-mono text-xs text-muted-foreground">
+            AI SDK HarnessAgent · Vercel Sandbox
+          </span>
+          <Button variant="ghost" className="h-7 px-2 text-xs" onClick={() => void signOut()}>
+            Sign out
+          </Button>
+        </div>
       </header>
       <div className="flex-1 w-full min-h-0 overflow-hidden pt-2">
         {activeId === null ? (

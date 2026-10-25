@@ -7,14 +7,17 @@ microVM; the chat keeps its session across requests and deploys.
 
 ![The console: chat with Devin's reasoning and tool calls, the sandbox, a live preview of the app it built, and its files](assets/harness-chat.png)
 
-[![Deploy with Vercel](https://vercel.com/button)](<https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FCOG-GTM%2Fdevin-sdk-examples%2Ftree%2Fmain%2Fharness-chat&project-name=devin-harness-chat&repository-name=devin-harness-chat&env=DEVIN_API_KEY&envDescription=Devin%20personal%20access%20token%20(cog_%E2%80%A6)&envLink=https%3A%2F%2Fapp.devin.ai%2Fsettings%2Fapi-keys&products=%5B%7B%22type%22%3A%22integration%22%2C%22protocol%22%3A%22storage%22%2C%22productSlug%22%3A%22upstash-kv%22%2C%22integrationSlug%22%3A%22upstash%22%7D%5D>)
+[![Deploy with Vercel](https://vercel.com/button)](<https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FCOG-GTM%2Fdevin-sdk-examples%2Ftree%2Fmain%2Fharness-chat&project-name=devin-harness-chat&repository-name=devin-harness-chat&env=DEVIN_API_KEY,HARNESS_CHAT_PASSWORD&envDescription=DEVIN_API_KEY%3A%20Devin%20personal%20access%20token%20(cog_%E2%80%A6).%20HARNESS_CHAT_PASSWORD%3A%20the%20password%20that%20guards%20the%20console%20and%20its%20API.&envLink=https%3A%2F%2Fapp.devin.ai%2Fsettings%2Fapi-keys&products=%5B%7B%22type%22%3A%22integration%22%2C%22protocol%22%3A%22storage%22%2C%22productSlug%22%3A%22upstash-kv%22%2C%22integrationSlug%22%3A%22upstash%22%7D%5D>)
 
-The button provisions the Upstash Redis store and asks for your `DEVIN_API_KEY`; Vercel
-Sandbox authenticates automatically on Vercel.
+The button provisions the Upstash Redis store and asks for your `DEVIN_API_KEY` and a
+`HARNESS_CHAT_PASSWORD`; Vercel Sandbox authenticates automatically on Vercel.
 
-> This is a single-user demo: there is no login, and anyone who can reach the deployment can
-> open any session in it. Put it behind [Vercel Deployment Protection](https://vercel.com/docs/deployment-protection)
-> or add your own auth before sharing a URL.
+> This is a single-user demo: one shared password (`HARNESS_CHAT_PASSWORD`) guards the console
+> and every `/api` route, and whoever has it can open any session. The app serves nothing until
+> the password is set. Scripts can send it as `Authorization: Bearer <password>`. For anything
+> beyond a demo, add per-user auth (`middleware.ts` is the one place to change) or put the
+> deployment behind [Vercel Deployment Protection](https://vercel.com/docs/deployment-protection)
+> as well.
 
 ## How it fits together
 
@@ -36,6 +39,9 @@ your server (Next.js route)                Vercel Sandbox (one per chat)
   `sessionId`, and therefore the sandbox name).
 - `lib/workspace.ts` — read-only view into a chat's sandbox (status, files, preview URL) for the
   side panels; the lifecycle itself belongs to `HarnessAgent`.
+- `middleware.ts` + `lib/auth.ts` — the password gate: `/api/*` and the console require the
+  session cookie that `POST /api/auth` sets (or the password as a bearer token); otherwise 401,
+  or a redirect to `/login`.
 
 ## Run locally
 
@@ -48,6 +54,7 @@ bun install                           # @cognition-ai/* from npm (the pinned bet
 vercel link                           # pick or create the project (once)
 vercel env pull                       # writes .env.local: VERCEL_OIDC_TOKEN, KV_REST_API_*, REDIS_URL
 echo 'DEVIN_API_KEY=cog_…' >> .env.local
+echo 'HARNESS_CHAT_PASSWORD=…' >> .env.local  # what the console asks for at /login
 bun run dev                           # http://localhost:3210
 ```
 
