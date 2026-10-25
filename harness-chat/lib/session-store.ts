@@ -147,22 +147,32 @@ export async function activeStreamId(chatId: string): Promise<string | null> {
 }
 
 /**
- * Login throttle: a fixed window of failed attempts per client address,
- * shared across server instances. True when the client may try again.
+ * Login throttle, shared across server instances. Attempts are counted
+ * before the password is checked (one atomic INCR per attempt), so parallel
+ * guesses cannot slip past the limit. Two fixed windows: per client address,
+ * and over the whole deployment as a backstop against spoofed addresses.
  */
 const LOGIN_WINDOW_SECONDS = 15 * 60;
-const LOGIN_MAX_FAILURES = 10;
-const loginFailuresKey = (client: string) => `harness-chat:login-failures:${client}`;
+const LOGIN_MAX_PER_CLIENT = 10;
+const LOGIN_MAX_TOTAL = 100;
+const loginAttemptsKey = (scope: string) => `harness-chat:login-attempts:${scope}`;
 
-export async function loginAllowed(client: string): Promise<boolean> {
-  const failures = await redis.get<number>(loginFailuresKey(client));
-  return (failures ?? 0) < LOGIN_MAX_FAILURES;
+async function countAttempt(scope: string): Promise<number> {
+  const key = loginAttemptsKey(scope);
+  const attempts = await redis.incr(key);
+  if (attempts === 1) await redis.expire(key, LOGIN_WINDOW_SECONDS);
+  return attempts;
 }
 
-export async function recordLoginFailure(client: string): Promise<void> {
-  const key = loginFailuresKey(client);
-  const failures = await redis.incr(key);
-  if (failures === 1) await redis.expire(key, LOGIN_WINDOW_SECONDS);
+/** Record one login attempt for `client`; true when it may be checked against the password. */
+export async function allowLoginAttempt(client: string): Promise<boolean> {
+  const [perClient, total] = await Promise.all([countAttempt(client), countAttempt("*")]);
+  return perClient <= LOGIN_MAX_PER_CLIENT && total <= LOGIN_MAX_TOTAL;
+}
+
+/** A successful sign-in forgives the client's earlier misses. */
+export async function clearLoginAttempts(client: string): Promise<void> {
+  await redis.del(loginAttemptsKey(client));
 }
 
 async function activeChatIds(chatIds: string[]): Promise<Set<string>> {
