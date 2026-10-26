@@ -47,11 +47,27 @@ export async function cookieValue(token: string): Promise<string> {
   return Array.from(new Uint8Array(mac), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
+/** Whether `request` arrived over TLS, directly or at a proxy that says so. */
+export function overTls(request: Request): boolean {
+  return (
+    new URL(request.url).protocol === "https:" ||
+    request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() === "https"
+  );
+}
+
+/**
+ * Whether the token may travel in the clear on this request: only to the
+ * machine itself. Anywhere else, a plaintext login hands the token and the
+ * cookie to whoever is on the network, so `/api/login` refuses it.
+ */
+export function plaintextAllowed(request: Request): boolean {
+  if (overTls(request)) return true;
+  const host = (request.headers.get("host") ?? new URL(request.url).host).replace(/:\d+$/, "");
+  return host === "localhost" || host === "127.0.0.1" || host === "[::1]";
+}
+
 /** A `Set-Cookie` header value: signed in when `value` is given, signed out otherwise. */
 export function sessionCookie(request: Request, value: string | undefined): string {
-  const secure =
-    new URL(request.url).protocol === "https:" ||
-    request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() === "https";
   const parts = [
     `${COOKIE}=${value ?? ""}`,
     "Path=/",
@@ -59,7 +75,7 @@ export function sessionCookie(request: Request, value: string | undefined): stri
     "SameSite=Strict",
     `Max-Age=${String(value === undefined ? 0 : COOKIE_MAX_AGE_S)}`,
   ];
-  if (secure) parts.push("Secure");
+  if (overTls(request)) parts.push("Secure");
   return parts.join("; ");
 }
 

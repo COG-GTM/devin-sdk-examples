@@ -2,9 +2,13 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { authorized, boardToken, unconfigured } from "@/lib/auth";
 
-/** Everything but Next's own assets: the page, the stream, any future route. */
+/**
+ * Everything but Next's hashed static assets: the page, the stream, any
+ * future route, and `/_next/image` too — the board has no images, so the
+ * optimizer has no business answering strangers.
+ */
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|favicon.ico).*)"],
 };
 
 /**
