@@ -3,6 +3,7 @@ import {
   boardToken,
   cookieValue,
   equal,
+  plaintextAllowed,
   sessionCookie,
   unconfigured,
 } from "@/lib/auth";
@@ -13,6 +14,12 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request): Promise<Response> {
   const token = boardToken();
   if (token === undefined) return unconfigured();
+  if (!plaintextAllowed(request)) {
+    return new Response(
+      "The board token only travels over HTTPS (or to localhost). Serve the board over TLS.\n",
+      { status: 403, headers: { "Content-Type": "text/plain; charset=utf-8" } },
+    );
+  }
   const form = await request.formData().catch(() => undefined);
   const sent = form?.get("token");
   if (typeof sent !== "string" || !equal(sent, token)) {

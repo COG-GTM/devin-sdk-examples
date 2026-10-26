@@ -67,7 +67,8 @@ browser tabs ◄── SSE /api/board/stream ── Next.js server ── one We
   re-attaches everything. Cards carry previews, not transcripts: the last line of
   Devin's last message and the latest tool title, each clipped to 200 characters. At most
   64 streams are open at once; past that the route answers 503 until one closes.
-- [middleware.ts](middleware.ts) runs before every page and route. With no `BOARD_TOKEN`
+- [middleware.ts](middleware.ts) runs before every page and route (everything but Next's
+  hashed static assets, `/_next/image` included). With no `BOARD_TOKEN`
   (16+ characters) it answers 503 to everything. Otherwise a request passes with
   `Authorization: Bearer $BOARD_TOKEN` or the `HttpOnly`, `SameSite=Strict` cookie that
   `POST /api/login` sets when the form at `/login` sends the right token — an HMAC under
@@ -122,6 +123,7 @@ it Node itself).
 
 The configuration is `DEVIN_API_KEY` and `BOARD_TOKEN`. Whoever has the token sees every
 session the key can see, so treat it like the key: generate it, pass it as a secret, and
-rotate it to sign everyone out. The cookie is only marked `Secure` when the request
-arrived over HTTPS (or `X-Forwarded-Proto: https` from your proxy), so serve the board
-over TLS before sharing a URL.
+rotate it to sign everyone out. `/api/login` only accepts the token over HTTPS (directly
+or with `X-Forwarded-Proto: https` from your proxy) or from `localhost`, and marks the
+cookie `Secure` when it came over TLS: a plaintext login on a shared network would hand
+the token to anyone listening, so serve the board over TLS before sharing a URL.
