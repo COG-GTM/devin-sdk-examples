@@ -22,7 +22,7 @@ import {
 } from "@cognition-ai/sdk";
 
 import type { BoardEvent, Card, PendingRequest, PullRequest } from "./card";
-import { firstLine, lastLine } from "./format";
+import { clip, firstLine, lastLine } from "./format";
 
 const DISCOVERY_INTERVAL_MS = 30_000;
 /** Re-list a little further back than the last scan so nothing falls between scans. */
@@ -416,7 +416,7 @@ function apply(card: Card, live: Live, event: SessionEvent): boolean {
       } else {
         live.messages.set(key, (live.messages.get(key) ?? "") + event.text);
       }
-      card.lastMessage = lastMessage(live);
+      card.lastMessage = lastLine(lastMessage(live));
       break;
     }
     case "user_message":
@@ -462,7 +462,7 @@ function toolCall(card: Card, call: ToolCall, settled: boolean): void {
     if (card.column === "needs-you") card.next = pendingLabel(card.pending) ?? card.next;
     return;
   }
-  card.tool = call.title ?? humanize(call.detail.tool);
+  card.tool = clip(call.title) ?? humanize(call.detail.tool);
 }
 
 function place(
