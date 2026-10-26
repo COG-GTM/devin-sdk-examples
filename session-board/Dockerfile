@@ -1,7 +1,10 @@
 # One long-lived process that talks to Devin's cloud and serves the board:
 #
 #   docker build -t session-board .
-#   docker run -p 3211:3211 -e DEVIN_API_KEY session-board
+#   docker run -p 3211:3211 -e DEVIN_API_KEY -e BOARD_TOKEN session-board
+#
+# Without BOARD_TOKEN the server answers 503 to everything: whoever can reach
+# it would otherwise see every session DEVIN_API_KEY can see.
 
 # Build: install and build with Bun. Optional dependencies stay: Next.js and
 # Tailwind ship their platform binaries that way.

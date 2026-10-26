@@ -11,16 +11,18 @@ thing you have to do (when there is one), what Devin is doing right now, the las
 it said, and its pull requests. A card lights up when it changes and moves columns as the
 session's status does. Clicking it opens the session in the Devin web app.
 
-> This is a single-user demo: there is no login, and anyone who can reach the board sees
-> every session `DEVIN_API_KEY` can see — titles, prompts, messages, repositories and pull
-> requests. Run it on your own machine, or put it behind your own auth or network before
-> sharing a URL.
+> Whoever can open the board sees every session `DEVIN_API_KEY` can see — titles, prompts,
+> messages, repositories and pull requests — so every request has to carry a second
+> secret, `BOARD_TOKEN`. The server serves nothing until one is set; a browser signs in
+> once at `/login`, a script sends it as `Authorization: Bearer …`. It is one shared
+> token, not accounts: for a team, put the board behind your own identity-aware proxy too.
 
 | File                                                           | Role                                                                                                                 |
 | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | [lib/board.ts](lib/board.ts)                                   | The board, server-side: `createDevin()`, seed from `listSessionsPage()`, `attach()` + `session.events()` per session |
 | [lib/card.ts](lib/card.ts)                                     | The wire model both sides share: `Card`, its columns, the `BoardEvent` stream                                        |
 | [app/api/board/stream/route.ts](app/api/board/stream/route.ts) | The board as server-sent events: a snapshot on connect, then a `card` per change                                     |
+| [middleware.ts](middleware.ts) + [lib/auth.ts](lib/auth.ts)    | The door: `BOARD_TOKEN` as a bearer header or the cookie `/api/login` sets, or nothing                               |
 | [lib/use-board.ts](lib/use-board.ts)                           | The browser's copy of the board, fed by `EventSource`                                                                |
 | [app/board.tsx](app/board.tsx)                                 | Columns, window / search / automation filters, the live indicator                                                    |
 | [components/session-card.tsx](components/session-card.tsx)     | One session as a card                                                                                                |
@@ -62,7 +64,16 @@ browser tabs ◄── SSE /api/board/stream ── Next.js server ── one We
   note whenever the board's own link to Devin changes. `EventSource` reconnects on its
   own and every connection starts with a fresh snapshot, so the browser keeps no
   bookkeeping. If the WebSocket to Devin drops, the board reconnects, re-scans and
-  re-attaches everything.
+  re-attaches everything. Cards carry previews, not transcripts: the last line of
+  Devin's last message and the latest tool title, each clipped to 200 characters. At most
+  64 streams are open at once; past that the route answers 503 until one closes.
+- [middleware.ts](middleware.ts) runs before every page and route. With no `BOARD_TOKEN`
+  (16+ characters) it answers 503 to everything. Otherwise a request passes with
+  `Authorization: Bearer $BOARD_TOKEN` or the `HttpOnly`, `SameSite=Strict` cookie that
+  `POST /api/login` sets when the form at `/login` sends the right token — an HMAC under
+  the token, so the token itself never reaches the browser and rotating it signs everyone
+  out. A browser without either is sent to `/login`; anything under `/api/` gets 401. The
+  stream route checks on its own as well, so a matcher mistake cannot open it.
 
 Attached sessions are cheap: one WebSocket and a few megabytes for hundreds of them; idle
 sessions send nothing. So the board stays attached after the last tab closes, and a tab
@@ -81,10 +92,16 @@ bun install        # @cognition-ai/sdk from npm (the pinned beta)
 
 ```sh
 export DEVIN_API_KEY=cog_…      # app.devin.ai → Settings → API keys
+export BOARD_TOKEN=$(openssl rand -hex 24)   # what the board asks for at /login
 bun run dev                     # http://localhost:3211
 ```
 
-Start a turn in one of the listed sessions from the web app and watch its card move.
+Open the board, paste the token, and start a turn in one of the listed sessions from the
+web app to watch its card move. From a script:
+
+```sh
+curl -N -H "Authorization: Bearer $BOARD_TOKEN" 'http://localhost:3211/api/board/stream?window=24h'
+```
 
 ## Deploy
 
@@ -95,7 +112,7 @@ would get its own. The [Dockerfile](Dockerfile) builds it:
 
 ```sh
 docker build -t session-board .
-docker run -p 3211:3211 -e DEVIN_API_KEY session-board
+docker run -p 3211:3211 -e DEVIN_API_KEY -e BOARD_TOKEN session-board
 ```
 
 Two stages: the first installs and builds with Bun, the second copies only Next's
@@ -103,5 +120,8 @@ Two stages: the first installs and builds with Bun, the second copies only Next'
 onto a plain Node image and runs it as the unprivileged `node` user (about 450 MB, most of
 it Node itself).
 
-The only configuration is `DEVIN_API_KEY`. Whoever can reach the board sees every
-session that key can see, so put it behind your own auth or network before sharing a URL.
+The configuration is `DEVIN_API_KEY` and `BOARD_TOKEN`. Whoever has the token sees every
+session the key can see, so treat it like the key: generate it, pass it as a secret, and
+rotate it to sign everyone out. The cookie is only marked `Secure` when the request
+arrived over HTTPS (or `X-Forwarded-Proto: https` from your proxy), so serve the board
+over TLS before sharing a URL.
