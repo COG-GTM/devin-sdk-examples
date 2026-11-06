@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { AUTH_COOKIE, matchesBoardToken } from "@/lib/auth";
 
 const COOKIE_MAX_AGE_S = 30 * 24 * 60 * 60;
+const LOOPBACK_HOST = /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/;
 
 /** Relative, because `request.url` names the bind address (0.0.0.0) in the container. */
 function redirect(location: string): NextResponse {
@@ -20,7 +21,8 @@ export async function POST(request: NextRequest) {
   response.cookies.set(AUTH_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: request.headers.get("x-forwarded-proto")?.startsWith("https") ?? false,
+    // A proxy may not report the scheme, so only loopback may go without TLS.
+    secure: !LOOPBACK_HOST.test(request.headers.get("host") ?? ""),
     path: "/",
     maxAge: COOKIE_MAX_AGE_S,
   });

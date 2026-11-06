@@ -116,3 +116,4 @@ it Node itself).
 The configuration is `DEVIN_API_KEY` and `BOARD_TOKEN`. Without `BOARD_TOKEN` every request is
 refused. Use a long random value, because whoever has it sees every session the key can see, and
 change it to sign everyone out. The login form has no rate limit, so a short token can be guessed.
+The login cookie is `Secure` on any host but localhost, so browsers can only sign in over HTTPS.
