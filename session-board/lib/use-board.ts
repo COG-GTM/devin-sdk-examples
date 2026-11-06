@@ -52,6 +52,8 @@ class BoardStore {
       this.#handle(JSON.parse(message.data) as BoardEvent);
     };
     source.onerror = () => {
+      // Closed rather than retrying: the server refused the stream, so log in again.
+      if (source.readyState === EventSource.CLOSED) location.assign("/login");
       this.#commit({ link: "reconnecting" });
     };
     this.#source = source;

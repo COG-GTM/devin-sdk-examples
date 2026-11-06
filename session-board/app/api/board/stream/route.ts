@@ -1,3 +1,6 @@
+import type { NextRequest } from "next/server";
+
+import { isAuthenticated, unauthorized } from "@/lib/auth";
 import { board } from "@/lib/board";
 import { isWindow, WINDOW_MS, type BoardEvent } from "@/lib/card";
 
@@ -10,8 +13,12 @@ const HEARTBEAT_MS = 15_000;
  * The board as server-sent events: a `snapshot` on connect, then a `card`
  * per change and a `connection` note whenever the board's own link to Devin
  * changes. Every browser tab shares the server's one connection to the cloud.
+ * The middleware already guards this route; the board is too sensitive to rely
+ * on its path matching alone.
  */
-export function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  if (!(await isAuthenticated(request))) return unauthorized();
+
   const window = new URL(request.url).searchParams.get("window");
   const windowMs = WINDOW_MS[isWindow(window) ? window : "24h"];
   const encoder = new TextEncoder();
