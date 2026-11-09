@@ -7,6 +7,7 @@ import { defineConfig } from "vitest/config";
 
 const testsDir = import.meta.dirname;
 export const FAKE_API_KEY = "cog_fake_test_key_do_not_leak";
+export const FAKE_POLICY_AUD = "fake-access-audience";
 
 function freePort(): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -35,6 +36,9 @@ export default defineConfig(async () => {
           bindings: {
             DEVIN_API_KEY: FAKE_API_KEY,
             DEVIN_BASE_URL: `http://127.0.0.1:${String(port)}`,
+            // The fake server also stands in for the Cloudflare Access team domain.
+            TEAM_DOMAIN: `http://127.0.0.1:${String(port)}`,
+            POLICY_AUD: FAKE_POLICY_AUD,
           },
         },
       }),

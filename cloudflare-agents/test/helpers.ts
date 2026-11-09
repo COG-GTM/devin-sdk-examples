@@ -30,6 +30,7 @@ export class AgentSocket {
   private constructor(
     readonly ws: WebSocket,
     readonly path: string,
+    readonly headers: Record<string, string>,
   ) {
     ws.addEventListener("message", (event) => {
       if (typeof event.data !== "string") return;
@@ -38,24 +39,29 @@ export class AgentSocket {
     });
   }
 
-  static async open(path: string): Promise<AgentSocket> {
+  /** Open `path` with `headers`; none means an anonymous caller. */
+  static async open(path: string, headers: Record<string, string> = {}): Promise<AgentSocket> {
     const response = await exports.default.fetch(`http://example.com${path}`, {
-      headers: { Upgrade: "websocket" },
+      headers: { ...headers, Upgrade: "websocket" },
     });
     const ws = response.webSocket;
     if (response.status !== 101 || ws === null) {
       throw new Error(`upgrade failed: ${String(response.status)} ${await response.text()}`);
     }
     ws.accept();
-    return new AgentSocket(ws, path);
+    return new AgentSocket(ws, path, headers);
   }
 
-  static workspace(workspace: string): Promise<AgentSocket> {
-    return AgentSocket.open(`/agents/workspace/${workspace}`);
+  /** The workspace's own user, unless `as` names someone else. */
+  static async workspace(workspace: string, as = workspace): Promise<AgentSocket> {
+    return AgentSocket.open(`/agents/workspace/${workspace}`, await signedIn(as));
   }
 
-  static chat(workspace: string, chatId: string): Promise<AgentSocket> {
-    return AgentSocket.open(`/agents/workspace/${workspace}/sub/devin-chat/${chatId}`);
+  static async chat(workspace: string, chatId: string, as = workspace): Promise<AgentSocket> {
+    return AgentSocket.open(
+      `/agents/workspace/${workspace}/sub/devin-chat/${chatId}`,
+      await signedIn(as),
+    );
   }
 
   send(frame: Frame): void {
@@ -131,7 +137,9 @@ export class AgentSocket {
 
   /** The persisted messages, as `useAgentChat` loads them on mount. */
   async initialMessages(): Promise<UIMessage[]> {
-    const response = await exports.default.fetch(`http://example.com${this.path}/get-messages`);
+    const response = await exports.default.fetch(`http://example.com${this.path}/get-messages`, {
+      headers: this.headers,
+    });
     if (!response.ok) throw new Error(`get-messages failed: ${String(response.status)}`);
     return response.json();
   }
@@ -145,6 +153,33 @@ function parseChunks(frame: Frame): Chunk[] {
   return typeof frame.body === "string" && frame.body.trim() !== ""
     ? [JSON.parse(frame.body) as Chunk]
     : [];
+}
+
+/** A Cloudflare Access JWT from the fake team domain. `claims` override the valid defaults. */
+export async function accessToken(
+  sub: string,
+  claims: Record<string, unknown> = {},
+): Promise<string> {
+  const now = Math.floor(Date.now() / 1000);
+  const response = await fetch(`${env.TEAM_DOMAIN}/__fake/access-token`, {
+    method: "POST",
+    body: JSON.stringify({
+      sub,
+      email: `${sub}@example.com`,
+      iss: env.TEAM_DOMAIN,
+      aud: [env.POLICY_AUD],
+      iat: now,
+      exp: now + 300,
+      ...claims,
+    }),
+  });
+  const { token } = await response.json<{ token: string }>();
+  return token;
+}
+
+/** The header Cloudflare Access adds to a signed-in user's requests. */
+export async function signedIn(sub: string): Promise<Record<string, string>> {
+  return { "Cf-Access-Jwt-Assertion": await accessToken(sub) };
 }
 
 export async function fakeRequests(): Promise<{ requests: RecordedRequest[] }> {

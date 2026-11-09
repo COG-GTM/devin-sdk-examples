@@ -6,7 +6,7 @@
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/agents/*"],
+    "run_worker_first": ["/agents/*", "/api/*"],
   },
   "durable_objects": {
     // Only `Workspace` is bound. Each `DevinChat` is a facet of a Workspace
@@ -18,6 +18,14 @@
   "vars": {
     "DEVIN_ORG_ID": "",
     "DEVIN_BASE_URL": "",
+    // Required to deploy: the Cloudflare Access team domain
+    // (https://<team>.cloudflareaccess.com) and the Access application's AUD
+    // tag. Without them the Worker rejects every request.
+    "TEAM_DOMAIN": "",
+    "POLICY_AUD": "",
+    // Local development only: set DEV_USER in .env, never here. It is only
+    // honored for requests to localhost.
+    "DEV_USER": "",
   },
   "secrets": {
     "required": ["DEVIN_API_KEY"],

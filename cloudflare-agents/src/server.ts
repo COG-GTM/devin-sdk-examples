@@ -1,7 +1,7 @@
 /**
  * Devin on Cloudflare Agents.
  *
- *     Workspace (demo)                  ◄── top-level Durable Object
+ *     Workspace (user id)               ◄── top-level Durable Object, one per user
  *       ├─ DevinChat (chat-abc) [facet] ◄── one per chat, owns one Devin session
  *       └─ DevinChat (chat-def) [facet]
  *
@@ -12,12 +12,16 @@
  *   `useAgentChat` works unchanged. It adds the sidebar bookkeeping, a live
  *   view of the session between turns, and permission answers.
  *
- * A real app would authenticate the user and use their id instead of `demo`.
+ * The Worker's `fetch` authenticates every request (`auth.ts`) and only routes
+ * a user to the `Workspace` named after their own id, so the Devin API key is
+ * never usable by an anonymous caller or across users.
  */
 import { connectDevin, DevinChatAgent, parseSessionId } from "@cognition-ai/cloudflare-agents";
 import { DevinError, type SessionInfo } from "@cognition-ai/sdk";
 import { Agent, callable, routeAgentRequest } from "agents";
 import type { UIMessage } from "ai";
+
+import { authenticate } from "./auth";
 
 export interface ChatSummary {
   id: string;
@@ -78,6 +82,12 @@ export interface SessionSnapshot {
   pullRequests: SessionPullRequest[];
   createdAt: string | null;
   updatedAt: string | null;
+}
+
+/** `GET /api/me`: who the Worker authenticated, and the workspace they may open. */
+export interface Me {
+  workspace: string;
+  email: string | null;
 }
 
 /** `createChat` input. Callable arguments come from the client, so fields are checked at runtime. */
@@ -361,6 +371,27 @@ function lastUserText(messages: readonly UIMessage[]): string {
 
 export default {
   async fetch(request: Request, env: Env) {
-    return (await routeAgentRequest(request, env)) ?? new Response("Not found", { status: 404 });
+    const user = await authenticate(request, env);
+    if (user instanceof Response) return user;
+
+    if (new URL(request.url).pathname === "/api/me") {
+      return Response.json({ workspace: user.id, email: user.email } satisfies Me, {
+        headers: { "Cache-Control": "no-store" },
+      });
+    }
+
+    // The workspace comes from the authenticated user, not from the URL: a
+    // request for any other instance (or any other Agent) is refused.
+    const ownWorkspace = (_request: Request, route: { className: string; name: string }) =>
+      route.className === "Workspace" && route.name === user.id
+        ? undefined
+        : new Response("Forbidden", { status: 403 });
+
+    return (
+      (await routeAgentRequest(request, env, {
+        onBeforeConnect: ownWorkspace,
+        onBeforeRequest: ownWorkspace,
+      })) ?? new Response("Not found", { status: 404 })
+    );
   },
 } satisfies ExportedHandler<Env>;

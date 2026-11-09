@@ -8,9 +8,14 @@
  * tests; these fixtures only exercise the app around it.
  *
  * `GET /__fake/requests` returns what the SDK sent.
+ *
+ * It also stands in for the Cloudflare Access team domain: it serves signing
+ * keys at `/cdn-cgi/access/certs`, and `POST /__fake/access-token` signs the
+ * claims in the body so tests can act as a user (or forge a bad token).
  */
 import { createServer, type IncomingMessage, type Server } from "node:http";
 
+import { exportJWK, generateKeyPair, SignJWT, type JWTPayload } from "jose";
 import { WebSocketServer, type WebSocket } from "ws";
 
 interface Rpc {
@@ -42,6 +47,11 @@ const sessionUrl = (id: string) => `https://app.devin.ai/sessions/${id.replace(/
 export async function startFakeDevin(port: number, apiKey: string): Promise<FakeDevin> {
   const requests: RecordedRequest[] = [];
   let nextSession = 0;
+  const kid = "fake-access-key";
+  const accessKeys = await generateKeyPair("RS256");
+  // A key the team domain does not publish, for forged tokens.
+  const otherKeys = await generateKeyPair("RS256");
+  const jwks = { keys: [{ ...(await exportJWK(accessKeys.publicKey)), kid, alg: "RS256" }] };
 
   const http = createServer((req, res) => {
     if (req.url === "/v3/self") {
@@ -53,6 +63,22 @@ export async function startFakeDevin(port: number, apiKey: string): Promise<Fake
     if (req.url === "/__fake/requests") {
       res.writeHead(200, { "content-type": "application/json" });
       res.end(JSON.stringify({ requests }));
+      return;
+    }
+    if (req.url === "/cdn-cgi/access/certs") {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify(jwks));
+      return;
+    }
+    if (req.url === "/__fake/access-token" && req.method === "POST") {
+      void readJson(req).then(async (body) => {
+        const { forged, ...claims } = body as JWTPayload & { forged?: boolean };
+        const token = await new SignJWT(claims)
+          .setProtectedHeader({ alg: "RS256", kid })
+          .sign(forged === true ? otherKeys.privateKey : accessKeys.privateKey);
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ token }));
+      });
       return;
     }
     res.writeHead(404).end();
@@ -81,6 +107,12 @@ export async function startFakeDevin(port: number, apiKey: string): Promise<Fake
     apiKey,
     close: () => closeAll(http, wss),
   };
+}
+
+async function readJson(req: IncomingMessage): Promise<unknown> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) chunks.push(chunk as Buffer);
+  return JSON.parse(Buffer.concat(chunks).toString("utf8"));
 }
 
 function authorized(req: IncomingMessage, apiKey: string): boolean {
