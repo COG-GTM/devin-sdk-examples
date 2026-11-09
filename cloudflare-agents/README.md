@@ -154,7 +154,9 @@ user gets their own `Workspace`, named after their user id:
   on each request (signature against the team's keys, issuer `TEAM_DOMAIN`, audience `POLICY_AUD`,
   expiry) and uses its `sub` as the user id. Requests without a valid token get `401`.
 - **Local development:** `DEV_USER` in `.env` names the user. It is only honored for requests to
-  `localhost` / `127.0.0.1`, and never when Cloudflare Access is configured.
+  `localhost` / `127.0.0.1`, and never when Cloudflare Access is configured. The host comes from
+  the request, so this protects a dev server that listens on loopback (the default), not one you
+  expose with `--host` or a tunnel: don't expose it while `DEV_USER` is set.
 - **Neither configured:** every request gets `401`.
 
 The workspace is never taken on trust from the URL. The browser asks `GET /api/me` for its
@@ -167,6 +169,10 @@ Everyone who is let in still shares one `DEVIN_API_KEY`, so "continue a session"
 sessions for all of them: only let in people you would give the key to. For per-user Devin keys,
 override `connectDevin()` in `DevinChat` instead of reading `env.DEVIN_API_KEY`. To use another
 identity provider, replace the body of `authenticate()`.
+
+Chats made before authentication existed live in the shared `demo` workspace, which signed-in users
+can no longer open. Their Devin sessions are untouched: use "continue a session" to bring one into
+your own workspace, transcript included.
 
 ## Tests
 
