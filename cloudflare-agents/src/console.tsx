@@ -23,7 +23,7 @@ import {
 import { toast } from "sonner";
 import { StickToBottom } from "use-stick-to-bottom";
 
-import type { ChatSummary, RecentSession, SessionSnapshot, WorkspaceState } from "./server";
+import type { ChatSummary, Me, RecentSession, SessionSnapshot, WorkspaceState } from "./server";
 import { Composer } from "./components/composer";
 import { Message, type MessageActions } from "./components/message";
 import { Columns, Panel, PanelHeader, PanelTitle, Rows } from "./components/panels";
@@ -34,10 +34,6 @@ import { notify } from "./components/toaster";
 import { Button, DevinDashed, Skeleton, SkeletonLines } from "./components/ui";
 import { awaitingPermission as isAwaitingPermission } from "./lib/tools";
 import { cn } from "./lib/utils";
-
-// One shared workspace for the demo. Put your auth in front of the Worker and
-// use the user's id here (see "Adding auth" in the README).
-const DEMO_USER = "demo";
 
 const TEST_PROMPTS = [
   "Write a Python script that prints the first 20 primes and run it",
@@ -58,8 +54,49 @@ function connectionStatus(readyState: number): ConnectionStatus {
   return "disconnected";
 }
 
+/**
+ * The Worker authenticates the request and says which workspace is the
+ * user's; it refuses any other name, so this is not a client-side choice.
+ */
 export function Console() {
-  const workspace = useAgent<WorkspaceState>({ agent: "Workspace", name: DEMO_USER });
+  const [me, setMe] = useState<Me | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/me")
+      .then(async (response) => {
+        if (!response.ok) throw new Error((await response.text()) || response.statusText);
+        return response.json() as Promise<Me>;
+      })
+      .then((value) => {
+        if (!cancelled) setMe(value);
+      })
+      .catch((cause: unknown) => {
+        if (!cancelled) setError(cause instanceof Error ? cause.message : String(cause));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (me !== null) return <WorkspaceConsole workspaceName={me.workspace} />;
+  return (
+    <div className="flex h-screen items-center justify-center p-6 text-center font-mono text-xs text-muted-foreground">
+      {error === null ? (
+        "Signing in…"
+      ) : (
+        <span className="flex max-w-md items-start gap-1.5 text-amber-700">
+          <TriangleAlertIcon className="mt-0.5 w-3.5 h-3.5 shrink-0" />
+          {error}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function WorkspaceConsole({ workspaceName }: { workspaceName: string }) {
+  const workspace = useAgent<WorkspaceState>({ agent: "Workspace", name: workspaceName });
   const chats = useMemo(() => workspace.state?.chats ?? null, [workspace.state]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<ReadonlySet<string>>(new Set());
@@ -202,18 +239,26 @@ export function Console() {
             right={<SidebarSkeleton empty />}
           />
         ) : (
-          <Chat key={active.id} chat={active} rail={rail} />
+          <Chat key={active.id} workspaceName={workspaceName} chat={active} rail={rail} />
         )}
       </div>
     </div>
   );
 }
 
-function Chat({ chat, rail }: { chat: ChatSummary; rail: ReactNode }) {
-  // The chat is a facet of the workspace: /agents/workspace/{DEMO_USER}/sub/devin-chat/{id}.
+function Chat({
+  workspaceName,
+  chat,
+  rail,
+}: {
+  workspaceName: string;
+  chat: ChatSummary;
+  rail: ReactNode;
+}) {
+  // The chat is a facet of the workspace: /agents/workspace/{user}/sub/devin-chat/{id}.
   const agent = useAgent<DevinChatState>({
     agent: "Workspace",
-    name: DEMO_USER,
+    name: workspaceName,
     sub: [{ agent: "DevinChat", name: chat.id }],
   });
   const state = agent.state;

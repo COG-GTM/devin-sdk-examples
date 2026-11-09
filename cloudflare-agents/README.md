@@ -10,9 +10,9 @@ The console is laid out like [harness-chat](../harness-chat): chats on the left,
 the middle, and on the right a **Session** panel (status, activity, cost, link to the Devin app)
 and a **Workspace** panel (Devin's plan, its pull requests, and the files it touched).
 
-> This is a single-user demo: there is no login, and anyone who can reach the Worker can use
-> your Devin key through it. Put [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
-> in front of it or add your own auth before sharing a URL (see [Adding auth](#adding-auth)).
+> The Worker uses your Devin key for everyone it lets in, so it rejects every request until
+> authentication is configured: [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/)
+> when deployed, `DEV_USER` on localhost (see [Authentication](#authentication)).
 
 ## How it fits together
 
@@ -50,20 +50,24 @@ Devin.
 ```sh
 cd cloudflare-agents
 bun install                                       # @cognition-ai/* from npm (the pinned betas)
-echo 'DEVIN_API_KEY=cog_…' > .env                 # app.devin.ai → Settings → API keys
+cp .env.example .env                              # DEVIN_API_KEY from app.devin.ai → Settings → API keys
 bun run start                                     # http://localhost:5173
 ```
 
 Local development talks to the real Devin cloud, so turns use ACUs. Optional variables, in `.env`
 or `wrangler.jsonc` `vars`:
 
-| Variable         | Default                        | Use                                     |
-| ---------------- | ------------------------------ | --------------------------------------- |
-| `DEVIN_API_KEY`  | required                       | Devin personal access token (`cog_…`)   |
-| `DEVIN_ORG_ID`   | the key's default organization | Pick an organization for multi-org keys |
-| `DEVIN_BASE_URL` | `https://api.devin.ai`         | Point at another Devin deployment       |
+| Variable         | Default                        | Use                                                                  |
+| ---------------- | ------------------------------ | -------------------------------------------------------------------- |
+| `DEVIN_API_KEY`  | required                       | Devin personal access token (`cog_…`)                                |
+| `DEVIN_ORG_ID`   | the key's default organization | Pick an organization for multi-org keys                              |
+| `DEVIN_BASE_URL` | `https://api.devin.ai`         | Point at another Devin deployment                                    |
+| `DEV_USER`       | none                           | Local only: the user that requests to localhost act as               |
+| `TEAM_DOMAIN`    | required to deploy             | Cloudflare Access team domain, `https://<team>.cloudflareaccess.com` |
+| `POLICY_AUD`     | required to deploy             | The Access application's audience (AUD) tag                          |
 
-Deploy with:
+To deploy, put the Worker behind a Cloudflare Access application, set `TEAM_DOMAIN` and
+`POLICY_AUD` in `wrangler.jsonc` `vars`, then:
 
 ```sh
 bunx wrangler secret put DEVIN_API_KEY
@@ -141,17 +145,34 @@ Nothing here stops a Devin session remotely. Archive or end sessions in the Devi
 `devin.api` (the REST client). Permission prompts wait in memory: a Durable Object restart or Stop
 answers them as cancelled.
 
-## Adding auth
+## Authentication
 
-The demo uses one workspace named `demo`. In a real app:
+Every request goes through `authenticate()` in `src/auth.ts` before it reaches an Agent, and each
+user gets their own `Workspace`, named after their user id:
 
-1. Authenticate the request in the Worker's `fetch`, or with the `onBeforeConnect` /
-   `onBeforeRequest` options of `routeAgentRequest`, and reject unknown users.
-2. Use the user's id as the workspace name instead of `DEMO_USER` in `src/client.tsx`.
-3. For per-user Devin keys, override `connectDevin()` in `DevinChat` instead of reading
-   `env.DEVIN_API_KEY`.
+- **Deployed:** the Worker verifies the [Cloudflare Access JWT](https://developers.cloudflare.com/cloudflare-one/identity/authorization-cookie/validating-json/)
+  on each request (signature against the team's keys, issuer `TEAM_DOMAIN`, audience `POLICY_AUD`,
+  expiry) and uses its `sub` as the user id. Requests without a valid token get `401`.
+- **Local development:** `DEV_USER` in `.env` names the user. It is only honored for requests to
+  `localhost` / `127.0.0.1`, and never when Cloudflare Access is configured. The host comes from
+  the request, so this protects a dev server that listens on loopback (the default), not one you
+  expose with `--host` or a tunnel: don't expose it while `DEV_USER` is set.
+- **Neither configured:** every request gets `401`.
 
-`onBeforeSubAgent` already keeps a workspace's chats private to that workspace.
+The workspace is never taken on trust from the URL. The browser asks `GET /api/me` for its
+workspace name, and the `onBeforeConnect` / `onBeforeRequest` hooks of `routeAgentRequest` answer
+`403` to a request for any other workspace. `onBeforeSubAgent` then keeps a workspace's chats
+private to that workspace. Requests whose `Origin` is another site are refused, so a page on
+another origin can't ride on a signed-in user's cookie.
+
+Everyone who is let in still shares one `DEVIN_API_KEY`, so "continue a session" lists that key's
+sessions for all of them: only let in people you would give the key to. For per-user Devin keys,
+override `connectDevin()` in `DevinChat` instead of reading `env.DEVIN_API_KEY`. To use another
+identity provider, replace the body of `authenticate()`.
+
+Chats made before authentication existed live in the shared `demo` workspace, which signed-in users
+can no longer open. Their Devin sessions are untouched: use "continue a session" to bring one into
+your own workspace, transcript included.
 
 ## Tests
 
@@ -161,9 +182,10 @@ bun run test
 
 The tests run the Worker in workerd with `@cloudflare/vitest-pool-workers` against a fake Devin
 ACP server (`test/fake-devin.ts`) and drive it over the same Agent WebSocket the browser uses. They
-cover what the example adds on the server: the sidebar, routing only to known chats, continuing a
-session, recent sessions, deleting chats, bad callable input and keeping the API key out of client
-frames. The UI is checked by hand against a real session; `bun run typecheck` covers both.
+cover what the example adds on the server: authentication and per-user workspaces, the sidebar,
+routing only to known chats, continuing a session, recent sessions, deleting chats, bad callable
+input and keeping the API key out of client frames. The UI is checked by hand against a real
+session; `bun run typecheck` covers both.
 The Devin turn protocol (stop, queueing, permissions, start over, recovery) is tested in
 `@cognition-ai/cloudflare-agents`. The fake server is test code only and is not part of the Worker
 bundle.
