@@ -11,10 +11,10 @@ thing you have to do (when there is one), what Devin is doing right now, the las
 it said, and its pull requests. A card lights up when it changes and moves columns as the
 session's status does. Clicking it opens the session in the Devin web app.
 
-> This is a single-user demo: there is no login, and anyone who can reach the board sees
-> every session `DEVIN_API_KEY` can see — titles, prompts, messages, repositories and pull
-> requests. Run it on your own machine, or put it behind your own auth or network before
-> sharing a URL.
+> The board shows every session `DEVIN_API_KEY` can see — titles, prompts, messages,
+> repositories and pull requests — so it stays locked until you set `BOARD_TOKEN`. Everyone
+> who has that one token sees all of it: there are no per-user accounts. Serve it over HTTPS
+> before sharing a URL.
 
 | File                                                           | Role                                                                                                                 |
 | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
@@ -24,6 +24,8 @@ session's status does. Clicking it opens the session in the Devin web app.
 | [lib/use-board.ts](lib/use-board.ts)                           | The browser's copy of the board, fed by `EventSource`                                                                |
 | [app/board.tsx](app/board.tsx)                                 | Columns, window / search / automation filters, the live indicator                                                    |
 | [components/session-card.tsx](components/session-card.tsx)     | One session as a card                                                                                                |
+| [middleware.ts](middleware.ts)                                 | Requires `BOARD_TOKEN` on every route but the login form ([lib/auth.ts](lib/auth.ts) holds the check)                |
+| [app/login/page.tsx](app/login/page.tsx)                       | The login form; [app/api/login/route.ts](app/api/login/route.ts) trades the token for an HttpOnly cookie             |
 | [Dockerfile](Dockerfile)                                       | The deployable: one container that talks to Devin's cloud                                                            |
 
 ## How it works
@@ -80,8 +82,16 @@ bun install        # @cognition-ai/sdk from npm (the pinned beta)
 ## Run
 
 ```sh
-export DEVIN_API_KEY=cog_…      # app.devin.ai → Settings → API keys
-bun run dev                     # http://localhost:3211
+export DEVIN_API_KEY=cog_…                  # app.devin.ai → Settings → API keys
+export BOARD_TOKEN=$(openssl rand -hex 32)  # what you sign in to the board with
+echo "$BOARD_TOKEN"
+bun run dev                                 # http://localhost:3211
+```
+
+Sign in with the token. Scripts can skip the form and send it as a header:
+
+```sh
+curl -N -H "Authorization: Bearer $BOARD_TOKEN" http://localhost:3211/api/board/stream
 ```
 
 Start a turn in one of the listed sessions from the web app and watch its card move.
@@ -95,7 +105,7 @@ would get its own. The [Dockerfile](Dockerfile) builds it:
 
 ```sh
 docker build -t session-board .
-docker run -p 3211:3211 -e DEVIN_API_KEY session-board
+docker run -p 3211:3211 -e DEVIN_API_KEY -e BOARD_TOKEN session-board
 ```
 
 Two stages: the first installs and builds with Bun, the second copies only Next's
@@ -103,5 +113,7 @@ Two stages: the first installs and builds with Bun, the second copies only Next'
 onto a plain Node image and runs it as the unprivileged `node` user (about 450 MB, most of
 it Node itself).
 
-The only configuration is `DEVIN_API_KEY`. Whoever can reach the board sees every
-session that key can see, so put it behind your own auth or network before sharing a URL.
+The configuration is `DEVIN_API_KEY` and `BOARD_TOKEN`. Without `BOARD_TOKEN` every request is
+refused. Use a long random value, because whoever has it sees every session the key can see, and
+change it to sign everyone out. The login form has no rate limit, so a short token can be guessed.
+The login cookie is `Secure` on any host but localhost, so browsers can only sign in over HTTPS.

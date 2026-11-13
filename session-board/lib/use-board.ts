@@ -17,6 +17,8 @@ export interface BoardState {
   lastEventAt: number | undefined;
 }
 
+const RETRY_MS = 5_000;
+
 const INITIAL: BoardState = {
   cards: [],
   link: "connecting",
@@ -47,12 +49,14 @@ class BoardStore {
 
   open(window: Window): void {
     this.close();
-    const source = new EventSource(`/api/board/stream?window=${window}`);
+    const url = `/api/board/stream?window=${window}`;
+    const source = new EventSource(url);
     source.onmessage = (message: MessageEvent<string>) => {
       this.#handle(JSON.parse(message.data) as BoardEvent);
     };
     source.onerror = () => {
       this.#commit({ link: "reconnecting" });
+      if (source.readyState === EventSource.CLOSED) void this.#recover(source, url, window);
     };
     this.#source = source;
     this.#commit({ link: "connecting" });
@@ -61,6 +65,22 @@ class BoardStore {
   close(): void {
     this.#source?.close();
     this.#source = undefined;
+  }
+
+  /**
+   * `EventSource` stops for good on any non-200 without saying which, so ask
+   * again: a 401 means log in, anything else is an outage to wait out.
+   */
+  async #recover(source: EventSource, url: string, window: Window): Promise<void> {
+    const response = await fetch(url).catch(() => undefined);
+    await response?.body?.cancel();
+    if (response?.status === 401) {
+      location.assign("/login");
+      return;
+    }
+    setTimeout(() => {
+      if (this.#source === source) this.open(window);
+    }, RETRY_MS);
   }
 
   #handle(event: BoardEvent): void {
