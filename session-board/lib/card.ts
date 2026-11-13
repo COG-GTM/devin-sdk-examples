@@ -56,7 +56,7 @@ export interface Card {
   /** The latest tool call, e.g. `$ bun test`. */
   tool: string | undefined;
   typing: boolean;
-  /** The last thing Devin said on the main chain. */
+  /** The last line of the last thing Devin said on the main chain, clipped. */
   lastMessage: string | undefined;
   /** First line of the prompt that started the session. */
   prompt: string | undefined;

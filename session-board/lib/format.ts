@@ -30,7 +30,8 @@ export function lastLine(message: string | undefined): string | undefined {
   return clip(message?.trim().split("\n").at(-1));
 }
 
-function clip(line: string | undefined, max = 200): string | undefined {
+/** One line at most `max` characters; the board carries previews, not transcripts. */
+export function clip(line: string | undefined, max = 200): string | undefined {
   const trimmed = line?.trim();
   if (trimmed === undefined || trimmed === "") return undefined;
   return trimmed.length > max ? `${trimmed.slice(0, max - 1)}…` : trimmed;
