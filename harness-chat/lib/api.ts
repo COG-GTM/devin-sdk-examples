@@ -6,8 +6,14 @@ import type { DevinUIMessage } from "./agent";
 import type { SessionMeta } from "./session-store";
 import type { FileNode, SandboxInfo } from "./workspace";
 
+/** The session cookie expired or was cleared: back to the login page. */
+function requireLogin(res: Response): void {
+  if (res.status === 401) window.location.assign("/login");
+}
+
 async function getJson<T>(url: string): Promise<T> {
   const res = await fetch(url);
+  requireLogin(res);
   if (!res.ok) throw new Error(`${url}: HTTP ${String(res.status)}`);
   return (await res.json()) as T;
 }
@@ -31,7 +37,13 @@ export const refreshSessions = () => mutate(sessionsKey);
 
 export async function deleteSession(chatId: string): Promise<void> {
   const res = await fetch(sessionKey(chatId), { method: "DELETE" });
+  requireLogin(res);
   if (!res.ok) throw new Error(`HTTP ${String(res.status)}`);
+}
+
+export async function signOut(): Promise<void> {
+  await fetch("/api/auth", { method: "DELETE" });
+  window.location.assign("/login");
 }
 
 /**

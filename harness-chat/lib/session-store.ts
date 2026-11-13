@@ -146,6 +146,35 @@ export async function activeStreamId(chatId: string): Promise<string | null> {
   return redis.get<string>(streamKey(chatId));
 }
 
+/**
+ * Login throttle, shared across server instances. Attempts are counted
+ * before the password is checked (one atomic INCR per attempt), so parallel
+ * guesses cannot slip past the limit. Two fixed windows: per client address,
+ * and over the whole deployment as a backstop against spoofed addresses.
+ */
+const LOGIN_WINDOW_SECONDS = 15 * 60;
+const LOGIN_MAX_PER_CLIENT = 10;
+const LOGIN_MAX_TOTAL = 100;
+const loginAttemptsKey = (scope: string) => `harness-chat:login-attempts:${scope}`;
+
+async function countAttempt(scope: string): Promise<number> {
+  const key = loginAttemptsKey(scope);
+  const attempts = await redis.incr(key);
+  if (attempts === 1) await redis.expire(key, LOGIN_WINDOW_SECONDS);
+  return attempts;
+}
+
+/** Record one login attempt for `client`; true when it may be checked against the password. */
+export async function allowLoginAttempt(client: string): Promise<boolean> {
+  const [perClient, total] = await Promise.all([countAttempt(client), countAttempt("*")]);
+  return perClient <= LOGIN_MAX_PER_CLIENT && total <= LOGIN_MAX_TOTAL;
+}
+
+/** A successful sign-in forgives the client's earlier misses. */
+export async function clearLoginAttempts(client: string): Promise<void> {
+  await redis.del(loginAttemptsKey(client));
+}
+
 async function activeChatIds(chatIds: string[]): Promise<Set<string>> {
   if (chatIds.length === 0) return new Set();
   const ids = await redis.mget<(string | null)[]>(...chatIds.map(streamKey));
